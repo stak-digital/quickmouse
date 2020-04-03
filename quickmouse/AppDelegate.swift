@@ -22,15 +22,70 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         "NUMPAD_1": 83,
         "NUMPAD_2": 84,
         "NUMPAD_3": 85,
+        "NUMPAD_ENTER": 76,
+        "RETURN": 36
     ]
     
     var window: NSWindow!
     
+    
     func myCallback(_ evt: NSEvent) {
-        let keyCode = evt.keyCode
         
-        if (Int(keyCode) == self.keyCodeDict["NUMPAD_7"]) {
-            print("yeeeee")
+        let keyCode = Int(evt.keyCode)
+        let currentSize = self.window.frame.size
+        let frame = self.window.frame
+                
+        var rect: NSRect;
+        
+        let newWidth = currentSize.width / 3
+        let newHeight = currentSize.height / 3
+        
+        switch keyCode {
+        case self.keyCodeDict["NUMPAD_7"]:
+            rect = NSRect(x: frame.minX, y: (((frame.maxY - frame.minY) / 3) * 2) + frame.minY, width: newWidth, height: newHeight)
+            self.resizeWindow(newFrame: rect)
+            break
+        case self.keyCodeDict["NUMPAD_8"]:
+            rect = NSRect(x: frame.minX + newWidth, y: (((frame.maxY - frame.minY) / 3) * 2) + frame.minY, width: newWidth, height: newHeight)
+            self.resizeWindow(newFrame: rect)
+            break
+        case self.keyCodeDict["NUMPAD_9"]:
+            rect = NSRect(x: frame.minX + newWidth * 2, y: (((frame.maxY - frame.minY) / 3) * 2) + frame.minY, width: newWidth, height: newHeight)
+            self.resizeWindow(newFrame: rect)
+        break
+        case self.keyCodeDict["NUMPAD_4"]:
+            rect = NSRect(x: frame.minX, y: frame.minY + newHeight, width: newWidth, height: newHeight)
+            self.resizeWindow(newFrame: rect)
+        break
+        case self.keyCodeDict["NUMPAD_5"]:
+            rect = NSRect(x: frame.minX + newWidth, y: frame.minY + newHeight, width: newWidth, height: newHeight)
+            self.resizeWindow(newFrame: rect)
+        break
+        case self.keyCodeDict["NUMPAD_6"]:
+            rect = NSRect(x: frame.minX + newWidth * 2, y: frame.minY + newHeight, width: newWidth, height: newHeight)
+            self.resizeWindow(newFrame: rect)
+        break
+        case self.keyCodeDict["NUMPAD_1"]:
+            rect = NSRect(x: frame.minX, y: frame.minY, width: newWidth, height: newHeight)
+            self.resizeWindow(newFrame: rect)
+        break
+        case self.keyCodeDict["NUMPAD_2"]:
+            rect = NSRect(x: frame.minX + newWidth, y: frame.minY, width: newWidth, height: newHeight)
+            self.resizeWindow(newFrame: rect)
+        break
+        case self.keyCodeDict["NUMPAD_3"]:
+            rect = NSRect(x: frame.minX + newWidth * 2, y: frame.minY, width: newWidth, height: newHeight)
+            self.resizeWindow(newFrame: rect)
+        break
+        case self.keyCodeDict["RETURN"]:
+            self.click(x: Int(frame.midX), y: Int(frame.midY))
+        break
+        default:
+            let alert = NSAlert.init()
+            alert.messageText = "Unsupported Keypress"
+            alert.informativeText = "Please use the numpad numbers 1-9, or ENTER"
+            alert.addButton(withTitle: "OK")
+            alert.runModal()
         }
     }
     
@@ -45,7 +100,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Create the window and set the content view. 
         window = MyWindow(
             contentRect: fullScreenWindowRect,
-            styleMask: [.fullSizeContentView, .titled],
+            styleMask: [.titled],
             backing: .buffered,
             shouldDefer: false,
             keyDownHandler: myCallback
@@ -63,5 +118,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Insert code here to tear down your application
     }
     
+    func resizeWindow(newFrame: NSRect) {
+        self.window.setFrame(newFrame, display: true)
+    }
     
+    func click(x: Int, y: Int) {
+        print("click at" + String(x) + " " + String(y))
+    }
 }
