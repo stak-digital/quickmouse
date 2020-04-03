@@ -8,6 +8,7 @@
 
 import Cocoa
 import SwiftUI
+import ApplicationServices
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -78,7 +79,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self.resizeWindow(newFrame: rect)
         break
         case self.keyCodeDict["RETURN"]:
-            self.click(x: Int(frame.midX), y: Int(frame.midY))
+            self.click(x: Int(frame.midX), y: Int(frame.maxY - frame.minY - 20 - (newHeight / 3))) // click at the middle of the middle cell
+            exit(0) // quit the application
         break
         default:
             let alert = NSAlert.init()
@@ -123,6 +125,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func click(x: Int, y: Int) {
-        print("click at" + String(x) + " " + String(y))
+        print("click at " + String(x) + "x" + String(y))
     }
 }
