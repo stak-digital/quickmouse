@@ -26,7 +26,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         "NUMPAD_2": 84,
         "NUMPAD_3": 85,
         "NUMPAD_ENTER": 76,
-        "RETURN": 36
+        "RETURN": 36,
+        "ARROW_RIGHT": 124,
+        "ARROW_LEFT": 123,
+        "ARROW_UP": 126,
+        "ARROW_DOWN": 125,
+        "ESCAPE": 53
     ]
     
     var window: NSWindow!
@@ -80,6 +85,27 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             rect = NSRect(x: frame.minX + newWidth * 2, y: frame.minY, width: newWidth, height: newHeight)
             self.resizeWindow(newFrame: rect)
             break
+        case self.keyCodeDict["ARROW_LEFT"]:
+            rect = NSRect(x: frame.minX, y: frame.minY, width: newWidth, height: frame.height)
+            self.resizeWindow(newFrame: rect)
+            break
+        case self.keyCodeDict["ARROW_RIGHT"]:
+            rect = NSRect(x: frame.minX + newWidth * 2, y: frame.minY, width: newWidth, height: frame.height)
+            self.resizeWindow(newFrame: rect)
+            break
+        case self.keyCodeDict["ARROW_UP"]:
+            rect = NSRect(x: frame.minX, y: (((frame.maxY - frame.minY) / 3) * 2) + frame.minY, width: frame.width, height: newHeight)
+            self.resizeWindow(newFrame: rect)
+            break
+        case self.keyCodeDict["ARROW_DOWN"]:
+            rect = NSRect(x: frame.minX, y: frame.minY, width: frame.width, height: newHeight)
+            self.resizeWindow(newFrame: rect)
+            break
+        case self.keyCodeDict["ESCAPE"]:
+            let screenSize = CGDisplayBounds(CGMainDisplayID())
+            rect = NSRect(x: 0, y: 0, width: screenSize.width, height: screenSize.height)
+            self.resizeWindow(newFrame: rect)
+            break
         case self.keyCodeDict["RETURN"]:
             self.window.close() // this is slow to close, so we need to add a delay before we trigger click
             // or else it'll just click our own app window
@@ -106,9 +132,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
             break
         default:
+            print(keyCode)
             let alert = NSAlert.init()
             alert.messageText = "Unsupported Keypress"
-            alert.informativeText = "Please use the numpad numbers 1-9, or ENTER"
+            alert.informativeText = "Please use the numpad numbers 1-9, or Arrow Keys, or ESCAPE or ENTER"
             alert.addButton(withTitle: "OK")
             alert.runModal()
         }
@@ -135,7 +162,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         window.contentView = NSHostingView(rootView: contentView)
         window.makeKeyAndOrderFront(nil)
         window.isOpaque = false
-        window.backgroundColor = NSColor(red: 1, green: 0, blue: 0, alpha: 0.1)
+        window.backgroundColor = NSColor(red: 1, green: 0, blue: 0, alpha: 0)
         window.setFrame(fullScreenWindowRect, display: true)
     }
     
