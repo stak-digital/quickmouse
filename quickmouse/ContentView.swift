@@ -8,16 +8,41 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct Col: View {
+    var number: Int;
+    
     var body: some View {
-        Text("Hello, World!")
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        Text(String(number)).frame(maxWidth: .infinity, maxHeight: .infinity).font(.system(size: 30))
     }
 }
 
+struct Row: View {
+    var index: Int;
+    
+    var body: some View {
+        HStack(spacing: 0) {
+            Col(number: index * 3 + 1).border(Color.green, width: 1)
+            Col(number: index * 3 + 2).border(Color.red, width: 1)
+            Col(number: index * 3 + 3).border(Color.blue, width: 1)
+        }
+    }
+}
+
+struct ContentView: View {
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            Row(index: 2)
+            Row(index: 1)
+            Row(index: 0)
+            }.frame(maxWidth: .infinity, maxHeight: .infinity).background(Color.clear)
+    }
+}
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        VStack {
+            ContentView()
+        }.background(Color.red)
     }
 }
