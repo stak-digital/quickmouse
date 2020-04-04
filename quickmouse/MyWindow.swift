@@ -31,4 +31,7 @@ class MyWindow: NSWindow {
         self.handleKeyDown(with)
     }
     
+    // https://stackoverflow.com/a/8284133
+    override var canBecomeKey: Bool { get { return true }}
+    
 }

@@ -25,9 +25,9 @@ struct Row: View {
     
     var body: some View {
         HStack(spacing: 0) {
-            Col(number: index * 3 + 1).border(Color.green, width: 1)
+            Col(number: index * 3 + 1).border(Color.red, width: 1)
             Col(number: index * 3 + 2).border(Color.red, width: 1)
-            Col(number: index * 3 + 3).border(Color.blue, width: 1)
+            Col(number: index * 3 + 3).border(Color.red, width: 1)
         }
     }
 }

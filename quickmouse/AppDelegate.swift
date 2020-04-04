@@ -152,7 +152,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Create the window and set the content view. 
         window = MyWindow(
             contentRect: fullScreenWindowRect,
-            styleMask: [.titled],
+            styleMask: [],
             backing: .buffered,
             shouldDefer: false,
             keyDownHandler: myCallback
