@@ -9,12 +9,18 @@
 import Cocoa
 import SwiftUI
 import ApplicationServices
+import Combine
 
-//import "ClickAction.h"
+class CellState: ObservableObject {
+    @Published var activeCell: Int = 5
+    @Published var downKeys: Array<Int> = []
+}
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
     
+    let cellState = CellState()
+        
     let keyCodeDict: Dictionary = [
         "NUMPAD_7": 89,
         "NUMPAD_8": 91,
@@ -37,9 +43,87 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var window: NSWindow!
     var highlightedCell = 5
     
-    func myCallback(_ evt: NSEvent) {
-        
+    func decrementColInRow(_ current: Int) -> Int {
+        switch current {
+        case 2:
+            return 1
+        case 3:
+            return 2
+        case 5:
+            return 4
+        case 6:
+            return 5
+        case 8:
+            return 7
+        case 9:
+            return 8
+        default:
+            return current
+        }
+    }
+    
+    func incrementColInRow(_ current: Int) -> Int {
+        switch current {
+        case 1:
+            return 2
+        case 2:
+            return 3
+        case 4:
+            return 5
+        case 5:
+            return 6
+        case 7:
+            return 8
+        case 8:
+            return 9
+        default:
+            return current
+        }
+    }
+    
+    func decrementRow(_ currentCol: Int) -> Int {
+        switch currentCol {
+        case 4...9:
+            return currentCol - 3
+        case 1...3:
+            return currentCol
+        default:
+            return currentCol
+        }
+    }
+    
+    func incrementRow(_ currentCol: Int) -> Int {
+        switch currentCol {
+        case 7...9:
+            return currentCol
+        case 1...6:
+            return currentCol + 3
+        default:
+            return currentCol
+        }
+    }
+    
+    func resetCol() {
+        self.cellState.activeCell = 5
+    }
+    
+    func handleKeyUp(_ evt: NSEvent) {
         let keyCode = Int(evt.keyCode)
+                
+        let index = self.cellState.downKeys.firstIndex(of: keyCode)
+        
+        if (index != nil) {
+            self.cellState.downKeys.remove(at: index!)
+        }
+        
+        if (self.cellState.downKeys.count == 0) {
+            if (keyCode != self.keyCodeDict["ESCAPE"]) {
+                self.selectCol(self.cellState.activeCell)
+            }
+        }
+    }
+    
+    func selectCol(_ col: Int) {
         let currentSize = self.window.frame.size
         let frame = self.window.frame
         
@@ -48,58 +132,99 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let newWidth = currentSize.width / 3
         let newHeight = currentSize.height / 3
         
+        switch col {
+            case 7:
+                rect = NSRect(x: frame.minX, y: (((frame.maxY - frame.minY) / 3) * 2) + frame.minY, width: newWidth, height: newHeight)
+                self.resizeWindow(newFrame: rect)
+                break
+            case 8:
+                rect = NSRect(x: frame.minX + newWidth, y: (((frame.maxY - frame.minY) / 3) * 2) + frame.minY, width: newWidth, height: newHeight)
+                self.resizeWindow(newFrame: rect)
+                break
+            case 9:
+                rect = NSRect(x: frame.minX + newWidth * 2, y: (((frame.maxY - frame.minY) / 3) * 2) + frame.minY, width: newWidth, height: newHeight)
+                self.resizeWindow(newFrame: rect)
+                break
+            case 4:
+                rect = NSRect(x: frame.minX, y: frame.minY + newHeight, width: newWidth, height: newHeight)
+                self.resizeWindow(newFrame: rect)
+                break
+            case 5:
+                rect = NSRect(x: frame.minX + newWidth, y: frame.minY + newHeight, width: newWidth, height: newHeight)
+                self.resizeWindow(newFrame: rect)
+                break
+            case 6:
+                rect = NSRect(x: frame.minX + newWidth * 2, y: frame.minY + newHeight, width: newWidth, height: newHeight)
+                self.resizeWindow(newFrame: rect)
+                break
+            case 1:
+                rect = NSRect(x: frame.minX, y: frame.minY, width: newWidth, height: newHeight)
+                self.resizeWindow(newFrame: rect)
+                break
+            case 2:
+                rect = NSRect(x: frame.minX + newWidth, y: frame.minY, width: newWidth, height: newHeight)
+                self.resizeWindow(newFrame: rect)
+                break
+            case 3:
+                rect = NSRect(x: frame.minX + newWidth * 2, y: frame.minY, width: newWidth, height: newHeight)
+                self.resizeWindow(newFrame: rect)
+                break
+            default:
+                print("Unsupported cell")
+                break
+        }
+    }
+    
+    func myCallback(_ evt: NSEvent) {
+        
+        let keyCode = Int(evt.keyCode)
+        let frame = self.window.frame
+        
+        if (self.cellState.downKeys.contains(keyCode) == false) {
+            self.cellState.downKeys.append(keyCode)
+        }
+        
+        var rect: NSRect;
+                
         switch keyCode {
         case self.keyCodeDict["NUMPAD_7"]:
-            rect = NSRect(x: frame.minX, y: (((frame.maxY - frame.minY) / 3) * 2) + frame.minY, width: newWidth, height: newHeight)
-            self.resizeWindow(newFrame: rect)
+            self.selectCol(7)
             break
         case self.keyCodeDict["NUMPAD_8"]:
-            rect = NSRect(x: frame.minX + newWidth, y: (((frame.maxY - frame.minY) / 3) * 2) + frame.minY, width: newWidth, height: newHeight)
-            self.resizeWindow(newFrame: rect)
+            self.selectCol(8)
             break
         case self.keyCodeDict["NUMPAD_9"]:
-            rect = NSRect(x: frame.minX + newWidth * 2, y: (((frame.maxY - frame.minY) / 3) * 2) + frame.minY, width: newWidth, height: newHeight)
-            self.resizeWindow(newFrame: rect)
+            self.selectCol(9)
             break
         case self.keyCodeDict["NUMPAD_4"]:
-            rect = NSRect(x: frame.minX, y: frame.minY + newHeight, width: newWidth, height: newHeight)
-            self.resizeWindow(newFrame: rect)
+            self.selectCol(4)
             break
         case self.keyCodeDict["NUMPAD_5"]:
-            rect = NSRect(x: frame.minX + newWidth, y: frame.minY + newHeight, width: newWidth, height: newHeight)
-            self.resizeWindow(newFrame: rect)
+            self.selectCol(5)
             break
         case self.keyCodeDict["NUMPAD_6"]:
-            rect = NSRect(x: frame.minX + newWidth * 2, y: frame.minY + newHeight, width: newWidth, height: newHeight)
-            self.resizeWindow(newFrame: rect)
+            self.selectCol(6)
             break
         case self.keyCodeDict["NUMPAD_1"]:
-            rect = NSRect(x: frame.minX, y: frame.minY, width: newWidth, height: newHeight)
-            self.resizeWindow(newFrame: rect)
+            self.selectCol(1)
             break
         case self.keyCodeDict["NUMPAD_2"]:
-            rect = NSRect(x: frame.minX + newWidth, y: frame.minY, width: newWidth, height: newHeight)
-            self.resizeWindow(newFrame: rect)
+            self.selectCol(2)
             break
         case self.keyCodeDict["NUMPAD_3"]:
-            rect = NSRect(x: frame.minX + newWidth * 2, y: frame.minY, width: newWidth, height: newHeight)
-            self.resizeWindow(newFrame: rect)
+            self.selectCol(3)
             break
         case self.keyCodeDict["ARROW_LEFT"]:
-            rect = NSRect(x: frame.minX, y: frame.minY, width: newWidth, height: frame.height)
-            self.resizeWindow(newFrame: rect)
+            self.cellState.activeCell = decrementColInRow(self.cellState.activeCell)
             break
         case self.keyCodeDict["ARROW_RIGHT"]:
-            rect = NSRect(x: frame.minX + newWidth * 2, y: frame.minY, width: newWidth, height: frame.height)
-            self.resizeWindow(newFrame: rect)
+            self.cellState.activeCell = incrementColInRow(self.cellState.activeCell)
             break
         case self.keyCodeDict["ARROW_UP"]:
-            rect = NSRect(x: frame.minX, y: (((frame.maxY - frame.minY) / 3) * 2) + frame.minY, width: frame.width, height: newHeight)
-            self.resizeWindow(newFrame: rect)
+            self.cellState.activeCell = incrementRow(self.cellState.activeCell)
             break
         case self.keyCodeDict["ARROW_DOWN"]:
-            rect = NSRect(x: frame.minX, y: frame.minY, width: frame.width, height: newHeight)
-            self.resizeWindow(newFrame: rect)
+            self.cellState.activeCell = decrementRow(self.cellState.activeCell)
             break
         case self.keyCodeDict["ESCAPE"]:
             let screenSize = CGDisplayBounds(CGMainDisplayID())
@@ -143,7 +268,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Create the SwiftUI view that provides the window contents.
-        let contentView = ContentView().background(Color.clear)
+        let contentView = ContentView().environmentObject(self.cellState).background(Color.clear)
         //        let menubarHeight: Float = 20
         let screenSize = CGDisplayBounds(CGMainDisplayID())
         
@@ -155,7 +280,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             styleMask: [],
             backing: .buffered,
             shouldDefer: false,
-            keyDownHandler: myCallback
+            keyDownHandler: myCallback,
+            keyUpHandler: handleKeyUp
         )
         window.center()
         window.setFrameAutosaveName("Main Window")
@@ -171,6 +297,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func resizeWindow(newFrame: NSRect) {
+        self.resetCol()
         self.window.setFrame(newFrame, display: true)
     }
     
