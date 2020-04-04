@@ -12,7 +12,11 @@ struct Col: View {
     var number: Int;
     
     var body: some View {
-        Text(String(number)).frame(maxWidth: .infinity, maxHeight: .infinity).font(.system(size: 30))
+        GeometryReader { geometry in
+            Text(String(self.number))
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .font(.system(size: geometry.size.width > 40 ? 30 : 15))
+        }
     }
 }
 
