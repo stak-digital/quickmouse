@@ -132,6 +132,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func showWindow() {
+        self.cellState.downKeys.removeAll(keepingCapacity: true)
         self.resetWindowSize()
         NSApp!.activate(ignoringOtherApps: true)
         self.window.makeKeyAndOrderFront(self)
@@ -302,6 +303,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let screenSize = CGDisplayBounds(CGMainDisplayID())
         
         let fullScreenWindowRect = NSRect(x: 0, y: 0, width: screenSize.width, height: screenSize.height - 20) // replace 20 with `menubarHeight`
+        
+        // The application does not appear in the Dock and does not have a menu
+        // bar, but it may be activated programmatically or by clicking on one
+        // of its windows.
+        NSApp!.setActivationPolicy(.accessory)
         
         // Create the window and set the content view.
         window = MyWindow(
