@@ -23,14 +23,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let cellState = CellState()
     
     var statusItem: NSStatusItem?
-    
     var hotKeyMonitor: Any?
-    
     var window: NSWindow!
     var highlightedCell = 5
-    
-    
-    
     var statusBarItem: NSStatusItem!
     
     func setupMenuBarIcon() {
@@ -91,8 +86,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         
         if (self.cellState.downKeys.count == 0) {
-            if (keyCode != KeyboardManager.keyCodes["ESCAPE"]) {
+            switch keyCode {
+                case KeyboardManager.keyCodes["ARROW_UP"],
+                     KeyboardManager.keyCodes["ARROW_RIGHT"],
+                     KeyboardManager.keyCodes["ARROW_DOWN"],
+                     KeyboardManager.keyCodes["ARROW_LEFT"]:
+//                case KeyboardManager.keyCodes["ESCAPE"], KeyboardManager.keyCodes["INSERT"],
+//                     KeyboardManager.keyCodes["SPACE"]:
                 self.selectCol(self.cellState.activeCell)
+                    break
+            default:
+//                self.selectCol(self.cellState.activeCell)
+                break
             }
         }
     }
@@ -180,10 +185,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self.cellState.downKeys.removeAll()
             self.resetWindowSize()
             break
+        case KeyboardManager.keyCodes["SPACE"]:
+            self.selectCol(5)
+        break
         case KeyboardManager.keyCodes["RETURN"]:
             self.submit()
             break
         case KeyboardManager.keyCodes["INSERT"]:
+//            self.showWindow()
             print("hotkey called while app had focus anyway")
             break
         default:
@@ -257,7 +266,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         window.isOpaque = false
         window.backgroundColor = NSColor(red: 0, green: 0, blue: 0, alpha: 0)
         
-        self.showWindow()
         self.listenForGlobalHotKey()
     }
     

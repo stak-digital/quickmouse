@@ -26,6 +26,7 @@ class KeyboardManager {
         "ARROW_UP": 126,
         "ARROW_DOWN": 125,
         "ESCAPE": 53,
-        "INSERT": 114
+        "INSERT": 114,
+        "SPACE": 49
     ]
 }
