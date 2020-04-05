@@ -113,30 +113,46 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func setupMenuBarIcon() {
 // // https://caseybrant.com/2019/02/20/macos-menu-bar-extras.html
-//        let statusBar = NSStatusBar.system
-//        statusBarItem = statusBar.statusItem(
-//            withLength: NSStatusItem.squareLength
-//        )
-//
-//        statusBarItem.button?.title = "🌯"
-//
-//        let statusBarMenu = NSMenu(title: "Cap Status Bar Menu")
-//
-//        statusBarItem.menu = statusBarMenu
+        let statusBar = NSStatusBar.system
+        statusBarItem = statusBar.statusItem(
+            withLength: NSStatusItem.squareLength
+        )
 
-        // https://medium.com/@hoishing/menu-bar-apps-f2d270150660
+        statusBarItem.button?.image = NSImage(named: NSImage.columnViewTemplateName)
+
+        let statusBarMenu = NSMenu(title: "Cap Status Bar Menu")
+
+        statusBarItem.menu = statusBarMenu
         
-        statusItem = NSStatusBar.system.statusItem(withLength: -1)
+        statusBarMenu.addItem(
+            withTitle: "Show Quickmouse",
+            action: #selector(self.showWindow),
+            keyEquivalent: ""
+        )
+        
+        statusBarMenu.addItem(
+            withTitle: "Quit Quickmouse",
+            action: #selector(self.quit),
+            keyEquivalent: ""
+        )
 
-        guard let button = statusItem?.button else {
-            print("status bar item failed. Try removing some menu bar item.")
-            NSApp.terminate(nil)
-            return
-        }
-
-        button.image = NSImage(named: NSImage.flowViewTemplateName)
-        button.target = self
-        button.action = #selector(self.showWindow)
+//        // https://medium.com/@hoishing/menu-bar-apps-f2d270150660
+//
+//        statusItem = NSStatusBar.system.statusItem(withLength: -1)
+//
+//        guard let button = statusItem?.button else {
+//            print("status bar item failed. Try removing some menu bar item.")
+//            NSApp.terminate(nil)
+//            return
+//        }
+//
+//        button.image = NSImage(named: NSImage.columnViewTemplateName)
+//        button.target = self
+//        button.action = #selector(self.showWindow)
+    }
+    
+    @objc func quit() {
+        exit(0)
     }
     
     func resetCol() {
