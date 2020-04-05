@@ -20,6 +20,8 @@ class CellState: ObservableObject {
 class AppDelegate: NSObject, NSApplicationDelegate {
     
     let cellState = CellState()
+    
+    var hotKeyMonitor: Any?
         
     let keyCodeDict: Dictionary = [
         "NUMPAD_7": 89,
@@ -37,7 +39,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         "ARROW_LEFT": 123,
         "ARROW_UP": 126,
         "ARROW_DOWN": 125,
-        "ESCAPE": 53
+        "ESCAPE": 53,
+        "INSERT": 114
     ]
     
     var window: NSWindow!
@@ -123,6 +126,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
     
+    func hideWindow() {
+        self.window.orderBack(self)
+        self.cellState.downKeys.removeAll(keepingCapacity: true)
+    }
+    
+    func showWindow() {
+        self.resetWindowSize()
+        NSApp!.activate(ignoringOtherApps: true)
+        self.window.makeKeyAndOrderFront(self)
+    }
+    
     func selectCol(_ col: Int) {
         let currentSize = self.window.frame.size
         let frame = self.window.frame
@@ -175,6 +189,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
     
+    func resetWindowSize() {
+        let screenSize = CGDisplayBounds(CGMainDisplayID())
+        let rect = NSRect(x: 0, y: 0, width: screenSize.width, height: screenSize.height)
+        self.resizeWindow(newFrame: rect)
+    }
+    
     func myCallback(_ evt: NSEvent) {
         
         let keyCode = Int(evt.keyCode)
@@ -183,9 +203,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if (self.cellState.downKeys.contains(keyCode) == false) {
             self.cellState.downKeys.append(keyCode)
         }
-        
-        var rect: NSRect;
-                
+                        
         switch keyCode {
         case self.keyCodeDict["NUMPAD_7"]:
             self.selectCol(7)
@@ -227,12 +245,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self.cellState.activeCell = decrementRow(self.cellState.activeCell)
             break
         case self.keyCodeDict["ESCAPE"]:
-            let screenSize = CGDisplayBounds(CGMainDisplayID())
-            rect = NSRect(x: 0, y: 0, width: screenSize.width, height: screenSize.height)
-            self.resizeWindow(newFrame: rect)
+            self.resetWindowSize()
             break
         case self.keyCodeDict["RETURN"]:
-            self.window.close() // this is slow to close, so we need to add a delay before we trigger click
+            self.hideWindow() // this is slow to close, so we need to add a delay before we trigger click
             // or else it'll just click our own app window
             
             let screenSize = CGDisplayBounds(CGMainDisplayID())
@@ -253,7 +269,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     y: Int(clickPos.y)
                 ) // click at the middle of the middle cell
                 
-                exit(0)
             }
             break
         default:
@@ -266,6 +281,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
     
+    func handleGlobalKeyPressed(_ event: NSEvent) {
+        let keyCode = Int(event.keyCode)
+        
+        if (keyCode == self.keyCodeDict["INSERT"]) {
+            if (event.modifierFlags.contains(.command)) {
+                self.showWindow()
+            }
+        }
+    }
+    
+    func listenForGlobalHotKey() {
+        self.hotKeyMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.keyDown], handler: self.handleGlobalKeyPressed)
+    }
+    
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Create the SwiftUI view that provides the window contents.
         let contentView = ContentView().environmentObject(self.cellState).background(Color.clear)
@@ -274,7 +303,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         let fullScreenWindowRect = NSRect(x: 0, y: 0, width: screenSize.width, height: screenSize.height - 20) // replace 20 with `menubarHeight`
         
-        // Create the window and set the content view. 
+        // Create the window and set the content view.
         window = MyWindow(
             contentRect: fullScreenWindowRect,
             styleMask: [],
@@ -286,10 +315,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         window.center()
         window.setFrameAutosaveName("Main Window")
         window.contentView = NSHostingView(rootView: contentView)
-        window.makeKeyAndOrderFront(nil)
+        self.showWindow()
         window.isOpaque = false
         window.backgroundColor = NSColor(red: 1, green: 0, blue: 0, alpha: 0)
         window.setFrame(fullScreenWindowRect, display: true)
+        
+        
+        self.listenForGlobalHotKey()
     }
     
     func applicationWillTerminate(_ aNotification: Notification) {

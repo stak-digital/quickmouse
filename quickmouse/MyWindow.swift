@@ -42,4 +42,6 @@ class MyWindow: NSWindow {
     // https://stackoverflow.com/a/8284133
     override var canBecomeKey: Bool { get { return true }}
     
+    override var isReleasedWhenClosed: Bool { get { return false } set {  } }
+    
 }
