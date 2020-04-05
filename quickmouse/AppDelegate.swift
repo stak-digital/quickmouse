@@ -110,61 +110,23 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func selectCol(_ col: Int) {
-        let currentSize = self.window.frame.size
-        let frame = self.window.frame
-        
-        var rect: NSRect;
-        
-        let newWidth = currentSize.width / CGFloat(CellManager.rows)
-        let newHeight = currentSize.height / CGFloat(CellManager.cols)
-        
+        let maxCellNumber = (CellManager.cols * CellManager.rows)
+
         switch col {
-            case 7:
-                rect = NSRect(x: frame.minX, y: (((frame.maxY - frame.minY) / 3) * 2) + frame.minY, width: newWidth, height: newHeight)
-                self.resizeWindow(newFrame: rect)
-                break
-            case 8:
-                rect = NSRect(x: frame.minX + newWidth, y: (((frame.maxY - frame.minY) / 3) * 2) + frame.minY, width: newWidth, height: newHeight)
-                self.resizeWindow(newFrame: rect)
-                break
-            case 9:
-                rect = NSRect(x: frame.minX + newWidth * 2, y: (((frame.maxY - frame.minY) / 3) * 2) + frame.minY, width: newWidth, height: newHeight)
-                self.resizeWindow(newFrame: rect)
-                break
-            case 4:
-                rect = NSRect(x: frame.minX, y: frame.minY + newHeight, width: newWidth, height: newHeight)
-                self.resizeWindow(newFrame: rect)
-                break
-            case 5:
-                rect = NSRect(x: frame.minX + newWidth, y: frame.minY + newHeight, width: newWidth, height: newHeight)
-                self.resizeWindow(newFrame: rect)
-                break
-            case 6:
-                rect = NSRect(x: frame.minX + newWidth * 2, y: frame.minY + newHeight, width: newWidth, height: newHeight)
-                self.resizeWindow(newFrame: rect)
-                break
-            case 1:
-                rect = NSRect(x: frame.minX, y: frame.minY, width: newWidth, height: newHeight)
-                self.resizeWindow(newFrame: rect)
-                break
-            case 2:
-                rect = NSRect(x: frame.minX + newWidth, y: frame.minY, width: newWidth, height: newHeight)
-                self.resizeWindow(newFrame: rect)
-                break
-            case 3:
-                rect = NSRect(x: frame.minX + newWidth * 2, y: frame.minY, width: newWidth, height: newHeight)
-                self.resizeWindow(newFrame: rect)
-                break
+            case 1...maxCellNumber:
+                let virtualFrame = WindowManager.convertToVirtualFrame(self.window.frame)
+                let nextFrame: NSRect = WindowManager.getRectForCell(currentRect: virtualFrame, whichCell: col)
+                self.resizeWindow(newFrame: nextFrame)
+            break
             default:
                 print("Unsupported cell")
-                break
+            break
         }
     }
     
     func resetWindowSize() {
         let screenSize = CGDisplayBounds(CGMainDisplayID())
-        let rect = NSRect(x: 0, y: 0, width: screenSize.width, height: screenSize.height)
-        self.resizeWindow(newFrame: rect)
+        self.resizeWindow(newFrame: screenSize)
     }
     
     func myCallback(_ evt: NSEvent) {
@@ -217,6 +179,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self.cellState.activeCell = CellManager.decrementRow(self.cellState.activeCell)
             break
         case KeyboardManager.keyCodes["ESCAPE"]:
+            self.cellState.downKeys.removeAll()
             self.resetWindowSize()
             break
         case KeyboardManager.keyCodes["RETURN"]:
@@ -278,7 +241,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // The application does not appear in the Dock and does not have a menu
         // bar, but it may be activated programmatically or by clicking on one
         // of its windows.
-        NSApp!.setActivationPolicy(.accessory)
+//        NSApp!.setActivationPolicy(.accessory)
         
         self.setupMenuBarIcon()
         
@@ -299,7 +262,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         window.backgroundColor = NSColor(red: 1, green: 0, blue: 0, alpha: 0)
         window.setFrame(fullScreenWindowRect, display: true)
         
-        
         self.listenForGlobalHotKey()
     }
     
@@ -309,7 +271,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func resizeWindow(newFrame: NSRect) {
         self.resetCol()
-        self.window.setFrame(newFrame, display: true)
+        self.window.setFrame(
+            WindowManager.convertToBufferFrame(newFrame),
+            display: true
+        )
     }
     
     func postMouseEvent(button: CGMouseButton, type: CGEventType, point: CGPoint) {
@@ -319,7 +284,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         } else {
             print("I dunno")
         }
-        
     }
     
     
