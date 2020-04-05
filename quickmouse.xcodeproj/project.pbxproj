@@ -18,6 +18,7 @@
 		02E7FF892439D2B7007F7931 /* CellManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E7FF882439D2B7007F7931 /* CellManager.swift */; };
 		02E7FF8B2439D5DB007F7931 /* KeyboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E7FF8A2439D5DB007F7931 /* KeyboardManager.swift */; };
 		02E7FF8D2439D905007F7931 /* WindowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E7FF8C2439D905007F7931 /* WindowManager.swift */; };
+		02E7FF8F2439F2CB007F7931 /* MouseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E7FF8E2439F2CB007F7931 /* MouseManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +36,7 @@
 		02E7FF882439D2B7007F7931 /* CellManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellManager.swift; sourceTree = "<group>"; };
 		02E7FF8A2439D5DB007F7931 /* KeyboardManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardManager.swift; sourceTree = "<group>"; };
 		02E7FF8C2439D905007F7931 /* WindowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowManager.swift; sourceTree = "<group>"; };
+		02E7FF8E2439F2CB007F7931 /* MouseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MouseManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,6 +82,7 @@
 				02E7FF882439D2B7007F7931 /* CellManager.swift */,
 				02E7FF8A2439D5DB007F7931 /* KeyboardManager.swift */,
 				02E7FF8C2439D905007F7931 /* WindowManager.swift */,
+				02E7FF8E2439F2CB007F7931 /* MouseManager.swift */,
 			);
 			path = quickmouse;
 			sourceTree = "<group>";
@@ -172,6 +175,7 @@
 				02BAA38B2436E9D600D67257 /* AppDelegate.swift in Sources */,
 				02E7FF8B2439D5DB007F7931 /* KeyboardManager.swift in Sources */,
 				0257CAEE243749DA0069048F /* ClickAction.m in Sources */,
+				02E7FF8F2439F2CB007F7931 /* MouseManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

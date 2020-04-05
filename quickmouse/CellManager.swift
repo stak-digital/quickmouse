@@ -12,7 +12,7 @@ class CellManager {
     static let rows = 3
     static let cols = 3
     
-    static func decrementColInRow(_ current: Int) -> Int {
+    static func decrementCol(_ current: Int) -> Int {
         switch current {
         case 2:
             return 1
@@ -31,7 +31,7 @@ class CellManager {
         }
     }
     
-    static func incrementColInRow(_ current: Int) -> Int {
+    static func incrementCol(_ current: Int) -> Int {
         switch current {
         case 1:
             return 2

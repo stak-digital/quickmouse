@@ -10,6 +10,11 @@ import Foundation
 
 class WindowManager {
     
+    // todo: memoize this and invalidate on screen resize
+    public static func getScreenSize() -> CGRect {
+        return CGDisplayBounds(CGMainDisplayID())
+    }
+    
     public static func getRectForCell(currentRect: NSRect, whichCell: Int) -> NSRect {
         let smallerWidth = CGFloat(Int(currentRect.width) / CellManager.cols)
         let smallerHeight = CGFloat(Int(currentRect.height) / CellManager.rows)
@@ -54,13 +59,13 @@ class WindowManager {
     }
     
     public static func invertYAxisValue(_ yVal: CGFloat, _ height: CGFloat) -> CGFloat {
-        let screenSize = CGDisplayBounds(CGMainDisplayID())
+        let screenSize = WindowManager.getScreenSize()
         
         return screenSize.height - (height + yVal)
     }
     
     public static func deInvert(_ yVal: CGFloat) -> CGFloat {
-        let screenSize = CGDisplayBounds(CGMainDisplayID())
+        let screenSize = WindowManager.getScreenSize()
 
         return screenSize.height - yVal
     }

@@ -125,14 +125,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func resetWindowSize() {
-        let screenSize = CGDisplayBounds(CGMainDisplayID())
-        self.resizeWindow(newFrame: screenSize)
+        self.resizeWindow(newFrame: WindowManager.getScreenSize())
     }
     
-    func myCallback(_ evt: NSEvent) {
+    func handleKeyDown(_ evt: NSEvent) {
         
         let keyCode = Int(evt.keyCode)
-        let frame = self.window.frame
         
         if (self.cellState.downKeys.contains(keyCode) == false) {
             self.cellState.downKeys.append(keyCode)
@@ -167,10 +165,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self.selectCol(3)
             break
         case KeyboardManager.keyCodes["ARROW_LEFT"]:
-            self.cellState.activeCell = CellManager.decrementColInRow(self.cellState.activeCell)
+            self.cellState.activeCell = CellManager.decrementCol(self.cellState.activeCell)
             break
         case KeyboardManager.keyCodes["ARROW_RIGHT"]:
-            self.cellState.activeCell = CellManager.incrementColInRow(self.cellState.activeCell)
+            self.cellState.activeCell = CellManager.incrementCol(self.cellState.activeCell)
             break
         case KeyboardManager.keyCodes["ARROW_UP"]:
             self.cellState.activeCell = CellManager.incrementRow(self.cellState.activeCell)
@@ -183,28 +181,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self.resetWindowSize()
             break
         case KeyboardManager.keyCodes["RETURN"]:
-            self.hideWindow() // this is slow to close, so we need to add a delay before we trigger click
-            // or else it'll just click our own app window
-            
-            let screenSize = CGDisplayBounds(CGMainDisplayID())
-            
-            let clickPos: NSPoint = NSPoint(
-                x: frame.midX,
-                y: screenSize.height - frame.midY
-            ) // click at the middle of the middle cell
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { // Change `2.0` to the desired number of seconds.
-                self.click(
-                    x: Int(clickPos.x),
-                    y: Int(clickPos.y)
-                ) // click at the middle of the middle cell
-                
-                self.click(
-                    x: Int(clickPos.x),
-                    y: Int(clickPos.y)
-                ) // click at the middle of the middle cell
-                
-            }
+            self.submit()
+            break
+        case KeyboardManager.keyCodes["INSERT"]:
+            print("hotkey called while app had focus anyway")
             break
         default:
             print(keyCode)
@@ -213,6 +193,27 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             alert.informativeText = "Please use the numpad numbers 1-9, or Arrow Keys, or ESCAPE or ENTER"
             alert.addButton(withTitle: "OK")
             alert.runModal()
+        }
+    }
+    
+    func submit() {
+        let screenSize = WindowManager.getScreenSize()
+        let frame = self.window.frame
+        
+        self.hideWindow() // this is slow to close, so we need to add a delay before we trigger click
+        // or else it'll just click our own app window
+        
+        let clickPos: NSPoint = NSPoint(
+            x: frame.midX,
+            y: screenSize.height - frame.midY
+        ) // click at the middle of the middle cell
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            // once to change the window focus to the target app
+            MouseManager.click(clickPos)
+            
+            // once to actually click
+            MouseManager.click(clickPos)
         }
     }
     
@@ -233,35 +234,30 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Create the SwiftUI view that provides the window contents.
         let contentView = ContentView().environmentObject(self.cellState).background(Color.clear)
-        //        let menubarHeight: Float = 20
-        let screenSize = CGDisplayBounds(CGMainDisplayID())
-        
-        let fullScreenWindowRect = NSRect(x: 0, y: 0, width: screenSize.width, height: screenSize.height - 20) // replace 20 with `menubarHeight`
         
         // The application does not appear in the Dock and does not have a menu
         // bar, but it may be activated programmatically or by clicking on one
         // of its windows.
-//        NSApp!.setActivationPolicy(.accessory)
+        NSApp!.setActivationPolicy(.accessory)
         
         self.setupMenuBarIcon()
         
         // Create the window and set the content view.
         window = MyWindow(
-            contentRect: fullScreenWindowRect,
+            contentRect: WindowManager.getScreenSize(),
             styleMask: [],
             backing: .buffered,
             shouldDefer: false,
-            keyDownHandler: myCallback,
+            keyDownHandler: handleKeyDown,
             keyUpHandler: handleKeyUp
         )
-        window.center()
+        
         window.setFrameAutosaveName("Main Window")
         window.contentView = NSHostingView(rootView: contentView)
-        self.showWindow()
         window.isOpaque = false
-        window.backgroundColor = NSColor(red: 1, green: 0, blue: 0, alpha: 0)
-        window.setFrame(fullScreenWindowRect, display: true)
+        window.backgroundColor = NSColor(red: 0, green: 0, blue: 0, alpha: 0)
         
+        self.showWindow()
         self.listenForGlobalHotKey()
     }
     
@@ -283,39 +279,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             theEvent.post(tap: .cghidEventTap);
         } else {
             print("I dunno")
-        }
-    }
-    
-    
-    func click(x: Int, y: Int) {
-        print("click at " + String(x) + "x" + String(y))
-        
-        let position = CGPoint(x: x, y: y)
-        
-        let source = CGEventSource.init(stateID: .hidSystemState)
-        let eventDown = CGEvent(mouseEventSource: source, mouseType: .leftMouseDown, mouseCursorPosition: position , mouseButton: .left)
-        let eventUp = CGEvent(mouseEventSource: source, mouseType: .leftMouseUp, mouseCursorPosition: position , mouseButton: .left)
-        
-        if let eDown = eventDown {
-            /*
-              These events will never actually be received by the system if there has been a code change
-              since the last build and you haven't toggled the Mac OS System Preferences -> Security & Privacy -> Accessibility
-              checkbox for this app. It will fail silently unless you uncheck it and re-check it again once per code change.
-             
-              Also these events require the App Sandbox to be disabled.
-             */
-            eDown.post(tap: .cghidEventTap)
-        } else {
-            print("Click didn't happen")
-        }
-        
-        usleep(500_000)
-        
-        
-        if let eUp = eventUp {
-            eUp.post(tap: .cghidEventTap)
-        } else {
-            print("Click didn't happen")
         }
     }
 }
