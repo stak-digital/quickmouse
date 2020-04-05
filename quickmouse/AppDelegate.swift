@@ -10,6 +10,7 @@ import Cocoa
 import SwiftUI
 import ApplicationServices
 import Combine
+import AppKit
 
 class CellState: ObservableObject {
     @Published var activeCell: Int = 5
@@ -20,6 +21,8 @@ class CellState: ObservableObject {
 class AppDelegate: NSObject, NSApplicationDelegate {
     
     let cellState = CellState()
+    
+    var statusItem: NSStatusItem?
     
     var hotKeyMonitor: Any?
         
@@ -106,6 +109,36 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
     
+    var statusBarItem: NSStatusItem!
+    
+    func setupMenuBarIcon() {
+// // https://caseybrant.com/2019/02/20/macos-menu-bar-extras.html
+//        let statusBar = NSStatusBar.system
+//        statusBarItem = statusBar.statusItem(
+//            withLength: NSStatusItem.squareLength
+//        )
+//
+//        statusBarItem.button?.title = "🌯"
+//
+//        let statusBarMenu = NSMenu(title: "Cap Status Bar Menu")
+//
+//        statusBarItem.menu = statusBarMenu
+
+        // https://medium.com/@hoishing/menu-bar-apps-f2d270150660
+        
+        statusItem = NSStatusBar.system.statusItem(withLength: -1)
+
+        guard let button = statusItem?.button else {
+            print("status bar item failed. Try removing some menu bar item.")
+            NSApp.terminate(nil)
+            return
+        }
+
+        button.image = NSImage(named: NSImage.flowViewTemplateName)
+        button.target = self
+        button.action = #selector(self.showWindow)
+    }
+    
     func resetCol() {
         self.cellState.activeCell = 5
     }
@@ -131,7 +164,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         self.cellState.downKeys.removeAll(keepingCapacity: true)
     }
     
-    func showWindow() {
+    @objc func showWindow() {
         self.cellState.downKeys.removeAll(keepingCapacity: true)
         self.resetWindowSize()
         NSApp!.activate(ignoringOtherApps: true)
@@ -308,6 +341,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // bar, but it may be activated programmatically or by clicking on one
         // of its windows.
         NSApp!.setActivationPolicy(.accessory)
+        
+        self.setupMenuBarIcon()
         
         // Create the window and set the content view.
         window = MyWindow(
