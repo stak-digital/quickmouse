@@ -25,89 +25,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var statusItem: NSStatusItem?
     
     var hotKeyMonitor: Any?
-        
-    let keyCodeDict: Dictionary = [
-        "NUMPAD_7": 89,
-        "NUMPAD_8": 91,
-        "NUMPAD_9": 92,
-        "NUMPAD_4": 86,
-        "NUMPAD_5": 87,
-        "NUMPAD_6": 88,
-        "NUMPAD_1": 83,
-        "NUMPAD_2": 84,
-        "NUMPAD_3": 85,
-        "NUMPAD_ENTER": 76,
-        "RETURN": 36,
-        "ARROW_RIGHT": 124,
-        "ARROW_LEFT": 123,
-        "ARROW_UP": 126,
-        "ARROW_DOWN": 125,
-        "ESCAPE": 53,
-        "INSERT": 114
-    ]
     
     var window: NSWindow!
     var highlightedCell = 5
     
-    func decrementColInRow(_ current: Int) -> Int {
-        switch current {
-        case 2:
-            return 1
-        case 3:
-            return 2
-        case 5:
-            return 4
-        case 6:
-            return 5
-        case 8:
-            return 7
-        case 9:
-            return 8
-        default:
-            return current
-        }
-    }
     
-    func incrementColInRow(_ current: Int) -> Int {
-        switch current {
-        case 1:
-            return 2
-        case 2:
-            return 3
-        case 4:
-            return 5
-        case 5:
-            return 6
-        case 7:
-            return 8
-        case 8:
-            return 9
-        default:
-            return current
-        }
-    }
-    
-    func decrementRow(_ currentCol: Int) -> Int {
-        switch currentCol {
-        case 4...9:
-            return currentCol - 3
-        case 1...3:
-            return currentCol
-        default:
-            return currentCol
-        }
-    }
-    
-    func incrementRow(_ currentCol: Int) -> Int {
-        switch currentCol {
-        case 7...9:
-            return currentCol
-        case 1...6:
-            return currentCol + 3
-        default:
-            return currentCol
-        }
-    }
     
     var statusBarItem: NSStatusItem!
     
@@ -169,7 +91,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         
         if (self.cellState.downKeys.count == 0) {
-            if (keyCode != self.keyCodeDict["ESCAPE"]) {
+            if (keyCode != KeyboardManager.keyCodes["ESCAPE"]) {
                 self.selectCol(self.cellState.activeCell)
             }
         }
@@ -193,8 +115,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         var rect: NSRect;
         
-        let newWidth = currentSize.width / 3
-        let newHeight = currentSize.height / 3
+        let newWidth = currentSize.width / CGFloat(CellManager.rows)
+        let newHeight = currentSize.height / CGFloat(CellManager.cols)
         
         switch col {
             case 7:
@@ -255,49 +177,49 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
                         
         switch keyCode {
-        case self.keyCodeDict["NUMPAD_7"]:
+        case KeyboardManager.keyCodes["NUMPAD_7"]:
             self.selectCol(7)
             break
-        case self.keyCodeDict["NUMPAD_8"]:
+        case KeyboardManager.keyCodes["NUMPAD_8"]:
             self.selectCol(8)
             break
-        case self.keyCodeDict["NUMPAD_9"]:
+        case KeyboardManager.keyCodes["NUMPAD_9"]:
             self.selectCol(9)
             break
-        case self.keyCodeDict["NUMPAD_4"]:
+        case KeyboardManager.keyCodes["NUMPAD_4"]:
             self.selectCol(4)
             break
-        case self.keyCodeDict["NUMPAD_5"]:
+        case KeyboardManager.keyCodes["NUMPAD_5"]:
             self.selectCol(5)
             break
-        case self.keyCodeDict["NUMPAD_6"]:
+        case KeyboardManager.keyCodes["NUMPAD_6"]:
             self.selectCol(6)
             break
-        case self.keyCodeDict["NUMPAD_1"]:
+        case KeyboardManager.keyCodes["NUMPAD_1"]:
             self.selectCol(1)
             break
-        case self.keyCodeDict["NUMPAD_2"]:
+        case KeyboardManager.keyCodes["NUMPAD_2"]:
             self.selectCol(2)
             break
-        case self.keyCodeDict["NUMPAD_3"]:
+        case KeyboardManager.keyCodes["NUMPAD_3"]:
             self.selectCol(3)
             break
-        case self.keyCodeDict["ARROW_LEFT"]:
-            self.cellState.activeCell = decrementColInRow(self.cellState.activeCell)
+        case KeyboardManager.keyCodes["ARROW_LEFT"]:
+            self.cellState.activeCell = CellManager.decrementColInRow(self.cellState.activeCell)
             break
-        case self.keyCodeDict["ARROW_RIGHT"]:
-            self.cellState.activeCell = incrementColInRow(self.cellState.activeCell)
+        case KeyboardManager.keyCodes["ARROW_RIGHT"]:
+            self.cellState.activeCell = CellManager.incrementColInRow(self.cellState.activeCell)
             break
-        case self.keyCodeDict["ARROW_UP"]:
-            self.cellState.activeCell = incrementRow(self.cellState.activeCell)
+        case KeyboardManager.keyCodes["ARROW_UP"]:
+            self.cellState.activeCell = CellManager.incrementRow(self.cellState.activeCell)
             break
-        case self.keyCodeDict["ARROW_DOWN"]:
-            self.cellState.activeCell = decrementRow(self.cellState.activeCell)
+        case KeyboardManager.keyCodes["ARROW_DOWN"]:
+            self.cellState.activeCell = CellManager.decrementRow(self.cellState.activeCell)
             break
-        case self.keyCodeDict["ESCAPE"]:
+        case KeyboardManager.keyCodes["ESCAPE"]:
             self.resetWindowSize()
             break
-        case self.keyCodeDict["RETURN"]:
+        case KeyboardManager.keyCodes["RETURN"]:
             self.hideWindow() // this is slow to close, so we need to add a delay before we trigger click
             // or else it'll just click our own app window
             
@@ -334,7 +256,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func handleGlobalKeyPressed(_ event: NSEvent) {
         let keyCode = Int(event.keyCode)
         
-        if (keyCode == self.keyCodeDict["INSERT"]) {
+        if (keyCode == KeyboardManager.keyCodes["INSERT"]) {
             if (event.modifierFlags.contains(.command)) {
                 self.showWindow()
             }

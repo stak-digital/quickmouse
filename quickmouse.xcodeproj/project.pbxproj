@@ -15,6 +15,8 @@
 		02BAA3922436E9E400D67257 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 02BAA3912436E9E400D67257 /* Preview Assets.xcassets */; };
 		02BAA3952436E9E400D67257 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 02BAA3932436E9E400D67257 /* Main.storyboard */; };
 		02BAA39E2436F9F300D67257 /* MyWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02BAA39D2436F9F300D67257 /* MyWindow.swift */; };
+		02E7FF892439D2B7007F7931 /* CellManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E7FF882439D2B7007F7931 /* CellManager.swift */; };
+		02E7FF8B2439D5DB007F7931 /* KeyboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E7FF8A2439D5DB007F7931 /* KeyboardManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +31,8 @@
 		02BAA3942436E9E400D67257 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		02BAA3962436E9E400D67257 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		02BAA39D2436F9F300D67257 /* MyWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyWindow.swift; sourceTree = "<group>"; };
+		02E7FF882439D2B7007F7931 /* CellManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellManager.swift; sourceTree = "<group>"; };
+		02E7FF8A2439D5DB007F7931 /* KeyboardManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,6 +75,8 @@
 				0257CAED243749DA0069048F /* ClickAction.m */,
 				0257CAEC243749D90069048F /* ClickAction.h */,
 				0257CAEF24374B0D0069048F /* ClickAction-Bridging-Header.h */,
+				02E7FF882439D2B7007F7931 /* CellManager.swift */,
+				02E7FF8A2439D5DB007F7931 /* KeyboardManager.swift */,
 			);
 			path = quickmouse;
 			sourceTree = "<group>";
@@ -156,9 +162,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				02BAA39E2436F9F300D67257 /* MyWindow.swift in Sources */,
+				02E7FF892439D2B7007F7931 /* CellManager.swift in Sources */,
 				02BAA38D2436E9D600D67257 /* ContentView.swift in Sources */,
 				0257CAF024374B0D0069048F /* ClickAction-Bridging-Header.h in Sources */,
 				02BAA38B2436E9D600D67257 /* AppDelegate.swift in Sources */,
+				02E7FF8B2439D5DB007F7931 /* KeyboardManager.swift in Sources */,
 				0257CAEE243749DA0069048F /* ClickAction.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
