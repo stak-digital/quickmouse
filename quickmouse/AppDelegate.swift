@@ -103,7 +103,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func hideWindow() {
-        self.window.orderBack(self)
+        self.window.orderOut(self)
         self.cellState.downKeys.removeAll(keepingCapacity: true)
     }
     
@@ -182,6 +182,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self.cellState.activeCell = CellManager.decrementRow(self.cellState.activeCell)
             break
         case KeyboardManager.keyCodes["ESCAPE"]:
+            print("hotkey called while app had focus anyway")
+            self.hideWindow()
             self.cellState.downKeys.removeAll()
             self.resetWindowSize()
             break
@@ -190,10 +192,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         break
         case KeyboardManager.keyCodes["RETURN"]:
             self.submit()
-            break
-        case KeyboardManager.keyCodes["INSERT"]:
-//            self.showWindow()
-            print("hotkey called while app had focus anyway")
             break
         default:
             print(keyCode)
@@ -216,6 +214,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             x: frame.midX,
             y: screenSize.height - frame.midY
         ) // click at the middle of the middle cell
+        
+        let windowTypes: CGWindowListOption = CGWindowListOption.init(rawValue: CGWindowListOption.optionOnScreenBelowWindow.rawValue | CGWindowListOption.excludeDesktopElements.rawValue)
+        let screens = CGWindowListCopyWindowInfo(windowTypes, CGWindowID(window.windowNumber))
+        
+        print(screens)
+        // todo: find screen under clickPos and set it to be key window, then click
+        
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             // once to change the window focus to the target app

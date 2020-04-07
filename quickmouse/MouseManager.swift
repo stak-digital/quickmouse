@@ -34,7 +34,7 @@ class MouseManager {
             print("Click didn't happen")
         }
         
-        usleep(500_000)
+        usleep(300_000)
         
         
         if let eUp = eventUp {

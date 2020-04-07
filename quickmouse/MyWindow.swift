@@ -44,4 +44,6 @@ class MyWindow: NSWindow {
     
     override var isReleasedWhenClosed: Bool { get { return false } set {  } }
     
+    override var animationBehavior: NSWindow.AnimationBehavior { get { return .none } set {} }
+    
 }
