@@ -27,6 +27,16 @@ class KeyboardManager {
         "ARROW_DOWN": 125,
         "ESCAPE": 53,
         "INSERT": 114,
-        "SPACE": 49
+        "SPACE": 49,
+        "BACKSLASH": 42,
+        "DIGIT_1": 18,
+        "DIGIT_2": 19,
+        "DIGIT_3": 20,
+        "DIGIT_4": 21,
+        "DIGIT_5": 23,
+        "DIGIT_6": 22,
+        "DIGIT_7": 26,
+        "DIGIT_8": 28,
+        "DIGIT_9": 25,
     ]
 }

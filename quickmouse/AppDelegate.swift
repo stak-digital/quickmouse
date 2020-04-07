@@ -142,31 +142,31 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
                         
         switch keyCode {
-        case KeyboardManager.keyCodes["NUMPAD_7"]:
+        case KeyboardManager.keyCodes["NUMPAD_7"], KeyboardManager.keyCodes["DIGIT_7"]:
             self.selectCol(7)
             break
-        case KeyboardManager.keyCodes["NUMPAD_8"]:
+        case KeyboardManager.keyCodes["NUMPAD_8"], KeyboardManager.keyCodes["DIGIT_8"]:
             self.selectCol(8)
             break
-        case KeyboardManager.keyCodes["NUMPAD_9"]:
+        case KeyboardManager.keyCodes["NUMPAD_9"], KeyboardManager.keyCodes["DIGIT_9"]:
             self.selectCol(9)
             break
-        case KeyboardManager.keyCodes["NUMPAD_4"]:
+        case KeyboardManager.keyCodes["NUMPAD_4"], KeyboardManager.keyCodes["DIGIT_4"]:
             self.selectCol(4)
             break
-        case KeyboardManager.keyCodes["NUMPAD_5"]:
+        case KeyboardManager.keyCodes["NUMPAD_5"], KeyboardManager.keyCodes["DIGIT_5"]:
             self.selectCol(5)
             break
-        case KeyboardManager.keyCodes["NUMPAD_6"]:
+        case KeyboardManager.keyCodes["NUMPAD_6"], KeyboardManager.keyCodes["DIGIT_6"]:
             self.selectCol(6)
             break
-        case KeyboardManager.keyCodes["NUMPAD_1"]:
+        case KeyboardManager.keyCodes["NUMPAD_1"], KeyboardManager.keyCodes["DIGIT_1"]:
             self.selectCol(1)
             break
-        case KeyboardManager.keyCodes["NUMPAD_2"]:
+        case KeyboardManager.keyCodes["NUMPAD_2"], KeyboardManager.keyCodes["DIGIT_2"]:
             self.selectCol(2)
             break
-        case KeyboardManager.keyCodes["NUMPAD_3"]:
+        case KeyboardManager.keyCodes["NUMPAD_3"], KeyboardManager.keyCodes["DIGIT_3"]:
             self.selectCol(3)
             break
         case KeyboardManager.keyCodes["ARROW_LEFT"]:
@@ -229,7 +229,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func handleGlobalKeyPressed(_ event: NSEvent) {
         let keyCode = Int(event.keyCode)
         
-        if (keyCode == KeyboardManager.keyCodes["INSERT"]) {
+        if (keyCode == KeyboardManager.keyCodes["ESCAPE"]) {
             if (event.modifierFlags.contains(.command)) {
                 self.showWindow()
             }
