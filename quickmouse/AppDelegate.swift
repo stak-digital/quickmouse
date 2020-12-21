@@ -94,13 +94,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func hideWindow() {
-        self.window.orderBack(self)
+        // https://stackoverflow.com/a/48353056/1063035
+        // hides the window. This is necessary because `window.orderOut` doesn't give focus to the next-underneath window.
+        NSApp.hide(self)
         self.cellState.downKeys.removeAll(keepingCapacity: true)
     }
     
     @objc func showWindow() {
         self.cellState.downKeys.removeAll(keepingCapacity: true)
         self.resetWindowSize()
+        NSApp.unhide(self)
         NSApp!.activate(ignoringOtherApps: true)
         self.window.makeKeyAndOrderFront(self)
     }
