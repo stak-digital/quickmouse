@@ -96,7 +96,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func removeOldestEventFromFlagChangePool() -> Void {
-        self.flagChangePool.remove(at: 0)
+        // need this check because if the async queuing of this fn ends up calling when the array is already empty, it crashes
+        if (self.flagChangePool.count > 0) {
+            self.flagChangePool.remove(at: 0)
+        }
         print(self.flagChangePool)
     }
     
@@ -114,6 +117,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.unhide(self)
         NSApp!.activate(ignoringOtherApps: true)
         self.window.makeKeyAndOrderFront(self)
+    }
+    
+    func isWindowShowing() -> Bool {
+        return NSApp.isHidden
     }
     
     func selectCol(_ col: Int) {
@@ -276,14 +283,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     // TODO: only do it on a double-tap of Caps Lock (or maybe trigger it on CTRL+CAPS?)
     func handleFlagsChanged(_ event: NSEvent) {
+        let isControlKeyDownRightNow = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.control)
+        
+        if (!isControlKeyDownRightNow) {
+            return
+        }
+        
         // add this event to a list of recent flag change events
         self.flagChangePool.append(event)
-        
-        // schedule the removal of this event from the list of flag change events
-        // todo: it doesn't really remove THIS event.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            self.removeOldestEventFromFlagChangePool()
-        }
         
         var eventsWithControlKeyDown: Array<NSEvent> = []
         
@@ -300,7 +307,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 //        let isControlKeyDown = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.control)
 
         if (eventsWithControlKeyDown.count >= 2) {
-            self.showWindow()
+            if (self.isWindowShowing()) {
+                self.showWindow()
+            } else {
+                self.hideWindow()
+            }
+            
+            // flush them all so that if the user presses it one more time, there won't be maybe 3 valid events in the time window
+            // causing only one more press to toggle again
+            // TODO: cancel all queued deletion calls from below!
+            self.flagChangePool.removeAll()
+        } else {
+            // schedule the removal of this event from the list of flag change events
+            // todo: it doesn't really remove THIS event.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                self.removeOldestEventFromFlagChangePool()
+            }
         }
     }
     
