@@ -77,29 +77,29 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func handleKeyUp(_ evt: NSEvent) {
-        let keyCode = Int(evt.keyCode)
-                
-        let index = self.cellState.downKeys.firstIndex(of: keyCode)
-        
-        if (index != nil) {
-            self.cellState.downKeys.remove(at: index!)
-        }
-        
-        if (self.cellState.downKeys.count == 0) {
-            switch keyCode {
-                case KeyboardManager.keyCodes["ARROW_UP"],
-                     KeyboardManager.keyCodes["ARROW_RIGHT"],
-                     KeyboardManager.keyCodes["ARROW_DOWN"],
-                     KeyboardManager.keyCodes["ARROW_LEFT"]:
-//                case KeyboardManager.keyCodes["ESCAPE"], KeyboardManager.keyCodes["INSERT"],
-//                     KeyboardManager.keyCodes["SPACE"]:
-                self.selectCol(self.cellState.activeCell)
-                    break
-            default:
+//        let keyCode = Int(evt.keyCode)
+//
+//        let index = self.cellState.downKeys.firstIndex(of: keyCode)
+//
+//        if (index != nil) {
+//            self.cellState.downKeys.remove(at: index!)
+//        }
+//
+//        if (self.cellState.downKeys.count == 0) {
+//            switch keyCode {
+//                case KeyboardManager.keyCodes["ARROW_UP"],
+//                     KeyboardManager.keyCodes["ARROW_RIGHT"],
+//                     KeyboardManager.keyCodes["ARROW_DOWN"],
+//                     KeyboardManager.keyCodes["ARROW_LEFT"]:
+////                case KeyboardManager.keyCodes["ESCAPE"], KeyboardManager.keyCodes["INSERT"],
+////                     KeyboardManager.keyCodes["SPACE"]:
 //                self.selectCol(self.cellState.activeCell)
-                break
-            }
-        }
+//                    break
+//            default:
+////                self.selectCol(self.cellState.activeCell)
+//                break
+//            }
+//        }
     }
     
     func hideWindow() {
@@ -186,7 +186,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self.resetWindowSize()
             break
         case KeyboardManager.keyCodes["SPACE"]:
-            self.selectCol(5)
+            self.selectCol(self.cellState.activeCell)
         break
         case KeyboardManager.keyCodes["RETURN"]:
             self.submit()
