@@ -97,6 +97,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // https://stackoverflow.com/a/48353056/1063035
         // hides the window. This is necessary because `window.orderOut` doesn't give focus to the next-underneath window.
         NSApp.hide(self)
+//        self.window.orderBack(self)
         self.cellState.downKeys.removeAll(keepingCapacity: true)
     }
     
@@ -241,7 +242,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let frame = self.window.frame
         
         self.hideWindow() // this is slow to close, so we need to add a delay before we trigger click
-        // or else it'll just click our own app window
+        // or else it'll just click our own app window (or the event just doesn't go through)
         
         let clickPos: NSPoint = NSPoint(
             x: frame.midX,
@@ -249,10 +250,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         ) // click at the middle of the middle cell
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            // once to change the window focus to the target app
-            MouseManager.click(clickPos)
-            
-            // once to actually click
+           
             MouseManager.click(clickPos)
         }
     }
