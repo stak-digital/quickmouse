@@ -28,8 +28,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var highlightedCell = 5
     var statusBarItem: NSStatusItem!
     
+    // the list of selections that the user has made. eg:
+    // [1, 5, 9] means the user selected top-left on the first zoom level, then the middle cell on the second zoom level, then the
+    // bottom-right cell ont he third zoom level (assuming a 1-indexed 3x3 grid)
+    var selectedCells: Array<Int> = []
+    
     func setupMenuBarIcon() {
-// // https://caseybrant.com/2019/02/20/macos-menu-bar-extras.html
+        // https://caseybrant.com/2019/02/20/macos-menu-bar-extras.html
         let statusBar = NSStatusBar.system
         statusBarItem = statusBar.statusItem(
             withLength: NSStatusItem.squareLength
@@ -52,20 +57,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             action: #selector(self.quit),
             keyEquivalent: ""
         )
-
-//        // https://medium.com/@hoishing/menu-bar-apps-f2d270150660
-//
-//        statusItem = NSStatusBar.system.statusItem(withLength: -1)
-//
-//        guard let button = statusItem?.button else {
-//            print("status bar item failed. Try removing some menu bar item.")
-//            NSApp.terminate(nil)
-//            return
-//        }
-//
-//        button.image = NSImage(named: NSImage.columnViewTemplateName)
-//        button.target = self
-//        button.action = #selector(self.showWindow)
     }
     
     @objc func quit() {
@@ -115,22 +106,60 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func selectCol(_ col: Int) {
-        let maxCellNumber = (CellManager.cols * CellManager.rows)
-
-        switch col {
-            case 1...maxCellNumber:
-                let virtualFrame = WindowManager.convertToVirtualFrame(self.window.frame)
-                let nextFrame: NSRect = WindowManager.getRectForCell(currentRect: virtualFrame, whichCell: col)
-                self.resizeWindow(newFrame: nextFrame)
-            break
-            default:
-                print("Unsupported cell")
-            break
+        self.selectedCells.append(col)
+        self.renderWindow()
+        
+//        let maxCellNumber = (CellManager.cols * CellManager.rows)
+//
+//        switch col {
+//            case 1...maxCellNumber:
+//                let virtualFrame = WindowManager.convertToVirtualFrame(self.window.frame)
+//                let nextFrame: NSRect = WindowManager.getRectForCell(currentRect: virtualFrame, whichCell: col)
+//                self.resizeWindow(newFrame: nextFrame)
+//            break
+//            default:
+//                print("Unsupported cell")
+//            break
+//        }
+    }
+    
+    func undoColSelection() {
+        
+        // if full-size already, we can't go any further, so just close the window.
+        // todo: maybe this should quit the app?
+        if (self.selectedCells.count == 0) {
+            self.hideWindow()
+            return
         }
+        
+        self.selectedCells.removeLast()
+        self.renderWindow()
+    }
+    
+    // given a list of sleected cells, work
+    func calculateWindowSize( selectedCells: Array<Int>) -> NSRect {
+        var rect: NSRect = WindowManager.getScreenSize()
+        
+        // TODO: just use a reduce() here
+        selectedCells.forEach({ cell in
+            rect = WindowManager.getRectForCell(currentRect: rect, whichCell: cell)
+        })
+        
+        return rect
     }
     
     func resetWindowSize() {
         self.resizeWindow(newFrame: WindowManager.getScreenSize())
+    }
+    
+    func renderWindow() {
+        print(self.selectedCells)
+
+        self.resizeWindow(
+            newFrame: self.calculateWindowSize(
+                selectedCells: self.selectedCells
+            )
+        )
     }
     
     func handleKeyDown(_ evt: NSEvent) {
@@ -182,8 +211,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self.cellState.activeCell = CellManager.decrementRow(self.cellState.activeCell)
             break
         case KeyboardManager.keyCodes["ESCAPE"]:
-            self.cellState.downKeys.removeAll()
-            self.resetWindowSize()
+            self.undoColSelection()
             break
         case KeyboardManager.keyCodes["SPACE"]:
             self.selectCol(self.cellState.activeCell)
