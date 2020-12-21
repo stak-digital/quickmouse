@@ -33,17 +33,17 @@ class MyWindow: NSWindow {
     }
     
     override func keyDown(with: NSEvent) {
-        super.keyDown(with: with)
+//        super.keyDown(with: with)
         self.handleKeyDown(with)
     }
     
     override func keyUp(with event: NSEvent) {
-        super.keyUp(with: event)
+//        super.keyUp(with: event)
         self.handleKeyUp(event)
     }
     
     override func flagsChanged(with event: NSEvent) {
-        super.flagsChanged(with: event)
+//        super.flagsChanged(with: event)
         self.handleFlagsChange(event)
     }
     

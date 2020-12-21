@@ -28,6 +28,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var highlightedCell = 5
     var statusBarItem: NSStatusItem!
     
+    var flagChangePool: Array<NSEvent> = []
+    
     // the list of selections that the user has made. eg:
     // [1, 5, 9] means the user selected top-left on the first zoom level, then the middle cell on the second zoom level, then the
     // bottom-right cell ont he third zoom level (assuming a 1-indexed 3x3 grid)
@@ -91,6 +93,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 //                break
 //            }
 //        }
+    }
+    
+    func removeOldestEventFromFlagChangePool() -> Void {
+        self.flagChangePool.remove(at: 0)
+        print(self.flagChangePool)
     }
     
     func hideWindow() {
@@ -269,12 +276,30 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     // TODO: only do it on a double-tap of Caps Lock (or maybe trigger it on CTRL+CAPS?)
     func handleFlagsChanged(_ event: NSEvent) {
-        print(event)
+        // add this event to a list of recent flag change events
+        self.flagChangePool.append(event)
         
-        let isCapsLockOn = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock)
-        let isControlKeyDown = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.control)
+        // schedule the removal of this event from the list of flag change events
+        // todo: it doesn't really remove THIS event.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            self.removeOldestEventFromFlagChangePool()
+        }
+        
+        var eventsWithControlKeyDown: Array<NSEvent> = []
+        
+        self.flagChangePool.forEach({ evt in
+            let isControlKeyDown = evt.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.control)
+            
+            if (isControlKeyDown) {
+                eventsWithControlKeyDown.append(evt)
+            }
+        })
+        
+        
+//        let isCapsLockOn = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock)
+//        let isControlKeyDown = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.control)
 
-        if (isCapsLockOn && isControlKeyDown) {
+        if (eventsWithControlKeyDown.count >= 2) {
             self.showWindow()
         }
     }
