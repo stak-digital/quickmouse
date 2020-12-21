@@ -38,5 +38,6 @@ class KeyboardManager {
         "DIGIT_7": 26,
         "DIGIT_8": 28,
         "DIGIT_9": 25,
+        "GRAVE_ACCENT": 50 // this thing: `
     ]
 }

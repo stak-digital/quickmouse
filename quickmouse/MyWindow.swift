@@ -13,6 +13,7 @@ class MyWindow: NSWindow {
     
     var handleKeyDown: (_ evt: NSEvent) -> ();
     var handleKeyUp: (_ evt: NSEvent) -> ();
+    var handleFlagsChange: (_ evt: NSEvent) -> ();
 
     init(
         contentRect: NSRect,
@@ -20,10 +21,12 @@ class MyWindow: NSWindow {
         backing: BackingStoreType,
         shouldDefer: Bool,
         keyDownHandler: @escaping (_ evt: NSEvent) -> Void,
-        keyUpHandler: @escaping (_ evt: NSEvent) -> Void
+        keyUpHandler: @escaping (_ evt: NSEvent) -> Void,
+        flagsChangeHandler: @escaping (_ evt: NSEvent) -> Void
     ) {
         self.handleKeyDown = keyDownHandler
         self.handleKeyUp = keyUpHandler
+        self.handleFlagsChange = flagsChangeHandler
 
         super.init(contentRect: contentRect, styleMask: styleMask, backing: backing, defer: shouldDefer)
         
@@ -37,6 +40,11 @@ class MyWindow: NSWindow {
     override func keyUp(with event: NSEvent) {
         super.keyUp(with: event)
         self.handleKeyUp(event)
+    }
+    
+    override func flagsChanged(with event: NSEvent) {
+        super.flagsChanged(with: event)
+        self.handleFlagsChange(event)
     }
     
     // https://stackoverflow.com/a/8284133

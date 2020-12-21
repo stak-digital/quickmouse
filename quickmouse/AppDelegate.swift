@@ -229,15 +229,30 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func handleGlobalKeyPressed(_ event: NSEvent) {
         let keyCode = Int(event.keyCode)
         
-        if (keyCode == KeyboardManager.keyCodes["ESCAPE"]) {
-            if (event.modifierFlags.contains(.command)) {
-                self.showWindow()
-            }
+        print(keyCode)
+                
+//        if (keyCode == KeyboardManager.keyCodes["GRAVE_ACCENT"]) {
+//            if (event.modifierFlags.contains(.control)) {
+//                self.showWindow()
+//            }
+//        }
+    }
+    
+    // TODO: only do it on a double-tap of Caps Lock (or maybe trigger it on CTRL+CAPS?)
+    func handleFlagsChanged(_ event: NSEvent) {
+        print(event)
+        
+        let isCapsLockOn = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock)
+        let isControlKeyDown = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.control)
+
+        if (isCapsLockOn && isControlKeyDown) {
+            self.showWindow()
         }
     }
     
     func listenForGlobalHotKey() {
         self.hotKeyMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.keyDown], handler: self.handleGlobalKeyPressed)
+        self.hotKeyMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.flagsChanged], handler: self.handleFlagsChanged)
     }
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
@@ -258,7 +273,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             backing: .buffered,
             shouldDefer: false,
             keyDownHandler: handleKeyDown,
-            keyUpHandler: handleKeyUp
+            keyUpHandler: handleKeyUp,
+            flagsChangeHandler: handleFlagsChanged
         )
         
         window.setFrameAutosaveName("Main Window")
@@ -281,6 +297,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         )
     }
     
+    // WARNING: this won't work unless the App has been given the correct access to the Accessibility API:
+    // https://stackoverflow.com/a/56928709
+    // In development, it will require that you toggle the checkbox off and EVERY TIME YOU CHANGE THE CODE AND REBUILD
     func postMouseEvent(button: CGMouseButton, type: CGEventType, point: CGPoint) {
         if let theEvent: CGEvent = CGEvent(mouseEventSource: nil, mouseType: type, mouseCursorPosition: point, mouseButton: button) {
             theEvent.type = type;
