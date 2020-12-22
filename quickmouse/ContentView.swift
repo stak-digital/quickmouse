@@ -1,11 +1,3 @@
-//
-//  ContentView.swift
-//  quickmouse
-//
-//  Created by Bryce Hanscomb on 3/4/20.
-//  Copyright © 2020 STAK Digital. All rights reserved.
-//
-
 import SwiftUI
 
 struct Col: View {
@@ -35,13 +27,13 @@ struct Row: View {
 
 struct ContentView: View {
     
-    @EnvironmentObject var cellState: CellState
+    @EnvironmentObject var grid: GridManager
         
     var body: some View {
         VStack(spacing: 0) {
-            Row(index: 2, activeCol: self.cellState.activeCell >= 7 ? self.cellState.activeCell % 3 : -1)
-            Row(index: 1, activeCol: (self.cellState.activeCell > 3 && self.cellState.activeCell < 7) ? self.cellState.activeCell % 3 : -1)
-            Row(index: 0, activeCol: self.cellState.activeCell < 4 ? self.cellState.activeCell % 3 : -1)
+            Row(index: 2, activeCol: self.grid.highlightedCell >= 7 ? self.grid.highlightedCell % 3 : -1)
+            Row(index: 1, activeCol: (self.grid.highlightedCell > 3 && self.grid.highlightedCell < 7) ? self.grid.highlightedCell % 3 : -1)
+            Row(index: 0, activeCol: self.grid.highlightedCell < 4 ? self.grid.highlightedCell % 3 : -1)
             }.frame(maxWidth: .infinity, maxHeight: .infinity).background(Color.clear)
     }
 }
