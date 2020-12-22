@@ -19,6 +19,7 @@ class KeyboardManager {
         "NUMPAD_1": 83,
         "NUMPAD_2": 84,
         "NUMPAD_3": 85,
+        "NUMPAD_0": 82,
         "NUMPAD_ENTER": 76,
         "RETURN": 36,
         "ARROW_RIGHT": 124,

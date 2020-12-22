@@ -104,32 +104,41 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let keyCode = Int(evt.keyCode)
 
         switch keyCode {
-        case KeyboardManager.keyCodes["NUMPAD_7"], KeyboardManager.keyCodes["DIGIT_7"]:
-            grid.moveHighlightTo(7)
-            break
-        case KeyboardManager.keyCodes["NUMPAD_8"], KeyboardManager.keyCodes["DIGIT_8"]:
-            grid.moveHighlightTo(8)
-            break
-        case KeyboardManager.keyCodes["NUMPAD_9"], KeyboardManager.keyCodes["DIGIT_9"]:
+        case KeyboardManager.keyCodes["NUMPAD_9"]:
             grid.moveHighlightTo(9)
+            selectHighlightedCell()
             break
-        case KeyboardManager.keyCodes["NUMPAD_4"], KeyboardManager.keyCodes["DIGIT_4"]:
-            grid.moveHighlightTo(4)
+        case KeyboardManager.keyCodes["NUMPAD_8"]:
+            grid.moveHighlightTo(8)
+            selectHighlightedCell()
             break
-        case KeyboardManager.keyCodes["NUMPAD_5"], KeyboardManager.keyCodes["DIGIT_5"]:
-            grid.moveHighlightTo(5)
+        case KeyboardManager.keyCodes["NUMPAD_7"]:
+            grid.moveHighlightTo(7)
+            selectHighlightedCell()
             break
-        case KeyboardManager.keyCodes["NUMPAD_6"], KeyboardManager.keyCodes["DIGIT_6"]:
+        case KeyboardManager.keyCodes["NUMPAD_6"]:
             grid.moveHighlightTo(6)
+            selectHighlightedCell()
             break
-        case KeyboardManager.keyCodes["NUMPAD_1"], KeyboardManager.keyCodes["DIGIT_1"]:
-            grid.moveHighlightTo(1)
+        case KeyboardManager.keyCodes["NUMPAD_5"]:
+            grid.moveHighlightTo(5)
+            selectHighlightedCell()
             break
-        case KeyboardManager.keyCodes["NUMPAD_2"], KeyboardManager.keyCodes["DIGIT_2"]:
-            grid.moveHighlightTo(2)
+        case KeyboardManager.keyCodes["NUMPAD_4"]:
+            grid.moveHighlightTo(4)
+            selectHighlightedCell()
             break
-        case KeyboardManager.keyCodes["NUMPAD_3"], KeyboardManager.keyCodes["DIGIT_3"]:
+        case KeyboardManager.keyCodes["NUMPAD_3"]:
             grid.moveHighlightTo(3)
+            selectHighlightedCell()
+            break
+        case KeyboardManager.keyCodes["NUMPAD_2"]:
+            grid.moveHighlightTo(2)
+            selectHighlightedCell()
+            break
+        case KeyboardManager.keyCodes["NUMPAD_1"]:
+            grid.moveHighlightTo(1)
+            selectHighlightedCell()
             break
         case KeyboardManager.keyCodes["ARROW_LEFT"]:
             grid.moveHighlightLeft()
@@ -146,13 +155,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         case KeyboardManager.keyCodes["ESCAPE"]:
             undoCellSelection()
             break
-        case KeyboardManager.keyCodes["SPACE"]:
+        case KeyboardManager.keyCodes["SPACE"], KeyboardManager.keyCodes["NUMPAD_0"]:
             selectHighlightedCell()
             break
-        case KeyboardManager.keyCodes["RETURN"]:
+        case KeyboardManager.keyCodes["RETURN"], KeyboardManager.keyCodes["NUMPAD_ENTER"]:
             submit()
             break
         default:
+            print(keyCode)
             showModal(
                 title: "Unsupported Keypress",
                 body: "Please use the numpad numbers 1-9, or Arrow Keys, or ESCAPE or ENTER",
