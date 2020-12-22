@@ -284,7 +284,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         window.ignoresMouseEvents = true
 
         grid.resetZoom()
-        hideWindow()
+        showWindow  ()
 
         globalHotkeyListener = NSEvent.addGlobalMonitorForEvents(matching: [.flagsChanged], handler: handleFlagsChanged)
         globalClickListener = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown], handler: handleGlobalClick)

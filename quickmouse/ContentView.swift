@@ -3,11 +3,33 @@ import SwiftUI
 struct Col: View {
     var number: Int;
     
+    static func getTextSize(_ frameSize: GeometryProxy) -> CGFloat {
+        CGFloat(frameSize.size.width > 100 ? 30 : 15)
+    }
+
+    static func getPaddingSize(_ frameSize: GeometryProxy) -> CGFloat {
+        CGFloat(frameSize.size.width > 100 ? 20 : 7)
+    }
+    
     var body: some View {
         GeometryReader { geometry in
-            Text(String(self.number))
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .font(.system(size: geometry.size.width > 40 ? 30 : 15))
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer().frame(width: Col.getPaddingSize(geometry))
+                    Text(String(number))
+                        .font(.system(size: Col.getTextSize(geometry)))
+                        .foregroundColor(.white)
+                        .shadow(color: .black, radius: 0.5)
+                        .shadow(color: .black, radius: 0.5)
+                        .shadow(color: .black, radius: 0.5)
+                        .shadow(color: .black, radius: 0.5)
+                        .shadow(color: .black, radius: 0.5)
+                    Spacer()
+                    
+                }
+                Spacer().frame(height: Col.getPaddingSize(geometry))
+            }
         }
     }
 }
