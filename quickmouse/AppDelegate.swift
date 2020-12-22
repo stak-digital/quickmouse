@@ -106,7 +106,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     // ---- [ Event handlers ] -----------------------------------------------------------------------------------------
 
-    func handleKeyDown(_ evt: NSEvent) {
+    func handleKeyUp(_ evt: NSEvent) {
         let keyCode = Int(evt.keyCode)
 
         switch keyCode {
@@ -255,7 +255,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             styleMask: [],
             backing: .buffered,
             shouldDefer: false,
-            keyDownHandler: handleKeyDown,
+            keyUpHandler: handleKeyUp,
             flagsChangeHandler: handleFlagsChanged
         )
 
