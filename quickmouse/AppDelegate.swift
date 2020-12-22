@@ -212,9 +212,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             y: screenSize.height - frame.midY
         ) // click at the middle of the middle cell
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             MouseManager.click(clickPos)
-        }
+//        }
     }
 
     func handleFlagsChanged(_ event: NSEvent) {
@@ -302,6 +302,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
          */
         window.level = NSWindow.Level.popUpMenu
 
+        /*
+         * Ensure we don't have to set the focus to the underlying window before we trigger a click
+
+         * see: https://stackoverflow.com/a/18023371/1063035
+         */
+        window.ignoresMouseEvents = true
+
         resetEverything()
         hideWindow()
         listenForGlobalHotKey()
@@ -322,12 +329,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // WARNING: this won't work unless the App has been given the correct access to the Accessibility API:
     // https://stackoverflow.com/a/56928709
     // In development, it will require that you toggle the checkbox off and EVERY TIME YOU CHANGE THE CODE AND REBUILD
-    func postMouseEvent(button: CGMouseButton, type: CGEventType, point: CGPoint) {
-        if let theEvent: CGEvent = CGEvent(mouseEventSource: nil, mouseType: type, mouseCursorPosition: point, mouseButton: button) {
-            theEvent.type = type;
-            theEvent.post(tap: .cghidEventTap);
-        } else {
-            print("I dunno")
-        }
-    }
+//    func postMouseEvent(button: CGMouseButton, type: CGEventType, point: CGPoint) {
+//        if let theEvent: CGEvent = CGEvent(mouseEventSource: nil, mouseType: type, mouseCursorPosition: point, mouseButton: button) {
+//            theEvent.type = type;
+//            theEvent.post(tap: .cghidEventTap);
+//        } else {
+//            print("I dunno")
+//        }
+//    }
 }
