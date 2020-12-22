@@ -185,6 +185,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 buttonText: "OK"
             )
         }
+
+        moveMouseToHighlightedCell()
     }
 
     func showModal(title: String, body: String, buttonText: String) -> Void {
@@ -240,6 +242,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             if (isWindowShowing()) {
                 resetEverything()
                 showWindow()
+                moveMouseToHighlightedCell()
             } else {
                 hideWindow()
             }
@@ -291,6 +294,58 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         resetEverything()
         hideWindow()
         listenForGlobalHotKey()
+    }
+
+    func getCenterPositionOfHighlightedCell() -> NSPoint {
+        let gridContainer: NSRect = calculateWindowSize(grid: grid)
+
+        let cellWidth = gridContainer.width / 3
+        let cellHeight = gridContainer.height / 3
+
+        let halfCellWidth = cellWidth / 2
+        let halfCellHeight = cellHeight / 2
+
+        let firstColMiddleX = gridContainer.minX// + halfCellWidth
+        let firstRowMiddleY = gridContainer.minY// + halfCellHeight
+
+        var middleX = firstColMiddleX
+        var middleY = firstRowMiddleY
+
+        switch grid.highlightedCell {
+            case 1,4,7:
+                middleX = middleX + (cellWidth * 0) + halfCellWidth
+                break
+            case 2,5,8:
+                middleX = middleX + (cellWidth * 1) + halfCellWidth
+                break
+            case 3,6,9:
+                middleX = middleX + (cellWidth * 2) + halfCellWidth
+            default:
+                break
+        }
+
+        switch grid.highlightedCell {
+            // top row
+            case 7,8,9:
+                middleY = middleY + (cellHeight * 0) + halfCellHeight
+                break
+            // center row
+            case 4,5,6:
+                middleY = middleY + (cellHeight * 1) + halfCellHeight
+                break
+            // bottom row
+            case 1,2,3:
+                middleY = middleY + (cellHeight * 2) + halfCellHeight
+                break
+            default:
+                break
+            }
+
+        return NSPoint(x: middleX, y: middleY)
+    }
+
+    func moveMouseToHighlightedCell() {
+        CGWarpMouseCursorPosition(getCenterPositionOfHighlightedCell())
     }
 
     // WARNING: this won't work unless the App has been given the correct access to the Accessibility API:

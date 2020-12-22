@@ -79,6 +79,13 @@ class WindowManager {
            height: bufferFrame.height
         )
     }
+
+    public static func convertToBufferPoint(_ virtualPoint: NSPoint, _ screenHeight: Float) -> NSPoint {
+        NSPoint(
+           x: virtualPoint.x,
+            y: WindowManager.invertYAxisValue(virtualPoint.y, CGFloat(screenHeight))
+        )
+    }
     
     public static func convertToBufferFrame(_ virtualFrame: NSRect) -> NSRect {
         return NSRect(
