@@ -221,7 +221,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         } else {
             // schedule the removal of this event from the list of flag change events
             // todo: it doesn't really remove THIS event.
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.33333 /* seconds */) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5 /* seconds */) {
                 self.removeOldestEventFromFlagChangePool()
             }
         }
