@@ -255,6 +255,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         hotKeyMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.flagsChanged], handler: handleFlagsChanged)
     }
 
+    func applicationWillTerminate(_ notification: Notification) {
+        if (hotKeyMonitor != nil) {
+            NSEvent.removeMonitor(hotKeyMonitor!)
+        }
+    }
+
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Create the SwiftUI view that provides the window contents.
         let contentView = ContentView().environmentObject(grid).background(Color.clear)
