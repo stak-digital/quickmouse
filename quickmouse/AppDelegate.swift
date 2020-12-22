@@ -20,7 +20,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var window: NSWindow!
     var statusBarItem: NSStatusItem = MenuBarManager.makeMenuBar()
     var flagChangePool: Array<NSEvent> = []
-    let grid = GridManager()
+    let grid = GridManager(rows: 3, cols: 3)
 
     // ---- [ Window methods ] -----------------------------------------------------------------------------------------
 

@@ -1,20 +1,21 @@
 import Foundation
 
-private class CellState: ObservableObject {
-    @Published var activeCell: Int = 5
-    @Published var downKeys: Array<Int> = []
-}
-
 class GridManager: ObservableObject {
+    public let rows: Int
+    public let cols: Int
     // the list of selections that the user has made. eg:
     // [1, 5, 9] means the user selected top-left on the first zoom level, then the middle cell on the second zoom level, then the
     // bottom-right cell ont he third zoom level (assuming a 1-indexed 3x3 grid)
     var selectedCells: Array<Int> = []
     @Published var highlightedCell = 5
-    private let cellState = CellState()
+
+    init(rows: Int, cols: Int) {
+        self.rows = rows
+        self.cols = cols
+    }
 
     func hasAnyZoom() -> Bool {
-     return selectedCells.count != 0
+     selectedCells.count != 0
     }
 
     func centerHighlight() {
