@@ -13,8 +13,6 @@ class MouseManager {
         let x = atPoint.x
         let y = atPoint.y
         
-//        print("click at " + String(x) + "x" + String(y))
-        
         let position = CGPoint(x: x, y: y)
         
         let source = CGEventSource.init(stateID: .hidSystemState)
@@ -34,9 +32,8 @@ class MouseManager {
             print("Click didn't happen")
         }
         
-        usleep(500_000)
-        
-        
+        usleep(250_000)
+
         if let eUp = eventUp {
             eUp.post(tap: .cghidEventTap)
         } else {
