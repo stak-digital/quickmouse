@@ -10,38 +10,11 @@ import AppKit
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
-    var statusItem: NSStatusItem?
     var hotKeyMonitor: Any?
     var window: NSWindow!
-    var statusBarItem: NSStatusItem!
+    var statusBarItem: NSStatusItem = MenuBarManager.makeMenuBar()
     var flagChangePool: Array<NSEvent> = []
     let grid = GridManager()
-
-    func setupMenuBarIcon() {
-        // https://caseybrant.com/2019/02/20/macos-menu-bar-extras.html
-        let statusBar = NSStatusBar.system
-        statusBarItem = statusBar.statusItem(
-            withLength: NSStatusItem.squareLength
-        )
-
-        statusBarItem.button?.image = NSImage(named: NSImage.columnViewTemplateName)
-
-        let statusBarMenu = NSMenu(title: "Cap Status Bar Menu")
-
-        statusBarItem.menu = statusBarMenu
-
-        statusBarMenu.addItem(
-            withTitle: "Show QuickMouse",
-            action: #selector(handleShowFromMenuRequested),
-            keyEquivalent: ""
-        )
-
-        statusBarMenu.addItem(
-            withTitle: "Quit QuickMouse",
-            action: #selector(handleQuitFromMenuRequested),
-            keyEquivalent: ""
-        )
-    }
 
     func quit() {
         exit(0)
@@ -270,9 +243,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // of its windows.
         NSApp!.setActivationPolicy(.accessory)
 
-        setupMenuBarIcon()
+        MenuBarManager.addItem(statusBarItem, "Show QuickMouse", onChosen: #selector(handleShowFromMenuRequested))
+        MenuBarManager.addItem(statusBarItem, "Quit QuickMouse", onChosen: #selector(handleQuitFromMenuRequested))
 
-        // Create the window and set the content view.
         window = MyWindow(
             contentRect: WindowManager.getScreenSize(),
             styleMask: [],
@@ -284,6 +257,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         )
 
         window.setFrameAutosaveName("Main Window")
+
+        /*
+         * Add the SwiftUI view as the renderable part of the window
+         */
         window.contentView = NSHostingView(rootView: contentView)
         window.isOpaque = false
         window.backgroundColor = NSColor(red: 0, green: 0, blue: 0, alpha: 0)
