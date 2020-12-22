@@ -1,14 +1,10 @@
-//
-//  MouseManager.swift
-//  quickmouse
-//
-//  Created by Bryce Hanscomb on 5/4/20.
-//  Copyright © 2020 STAK Digital. All rights reserved.
-//
-
 import Foundation
 
 class MouseManager {
+    public static func moveTo(_ point: NSPoint) {
+        CGWarpMouseCursorPosition(point)
+    }
+
     public static func click(_ atPoint: NSPoint) {
         let x = atPoint.x
         let y = atPoint.y

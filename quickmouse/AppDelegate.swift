@@ -201,20 +201,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func submit() {
-        let screenSize = WindowManager.getScreenSize()
-        let frame = window.frame
-
-        hideWindow() // this is slow to close, so we need to add a delay before we trigger click
-        // or else it'll just click our own app window (or the event just doesn't go through)
-
-        let clickPos: NSPoint = NSPoint(
-            x: frame.midX,
-            y: screenSize.height - frame.midY
-        ) // click at the middle of the middle cell
-
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            MouseManager.click(clickPos)
-//        }
+        hideWindow()
+        MouseManager.click(getCenterPositionOfHighlightedCell())
     }
 
     func handleFlagsChanged(_ event: NSEvent) {
@@ -323,18 +311,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func moveMouseToHighlightedCell() {
-        CGWarpMouseCursorPosition(getCenterPositionOfHighlightedCell())
+        MouseManager.moveTo(getCenterPositionOfHighlightedCell())
     }
-
-    // WARNING: this won't work unless the App has been given the correct access to the Accessibility API:
-    // https://stackoverflow.com/a/56928709
-    // In development, it will require that you toggle the checkbox off and EVERY TIME YOU CHANGE THE CODE AND REBUILD
-//    func postMouseEvent(button: CGMouseButton, type: CGEventType, point: CGPoint) {
-//        if let theEvent: CGEvent = CGEvent(mouseEventSource: nil, mouseType: type, mouseCursorPosition: point, mouseButton: button) {
-//            theEvent.type = type;
-//            theEvent.post(tap: .cghidEventTap);
-//        } else {
-//            print("I dunno")
-//        }
-//    }
 }
