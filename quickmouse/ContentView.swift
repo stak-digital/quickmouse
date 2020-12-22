@@ -31,9 +31,9 @@ struct ContentView: View {
         
     var body: some View {
         VStack(spacing: 0) {
-            Row(index: 2, activeCol: self.grid.highlightedCell >= 7 ? self.grid.highlightedCell % 3 : -1)
-            Row(index: 1, activeCol: (self.grid.highlightedCell > 3 && self.grid.highlightedCell < 7) ? self.grid.highlightedCell % 3 : -1)
-            Row(index: 0, activeCol: self.grid.highlightedCell < 4 ? self.grid.highlightedCell % 3 : -1)
+            Row(index: 2, activeCol: grid.highlightedCell >= 7 ? grid.highlightedCell % 3 : -1)
+            Row(index: 1, activeCol: (grid.highlightedCell > 3 && grid.highlightedCell < 7) ? grid.highlightedCell % 3 : -1)
+            Row(index: 0, activeCol: grid.highlightedCell < 4 ? grid.highlightedCell % 3 : -1)
             }.frame(maxWidth: .infinity, maxHeight: .infinity).background(Color.clear)
     }
 }

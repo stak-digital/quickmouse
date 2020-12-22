@@ -28,13 +28,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         statusBarItem.menu = statusBarMenu
         
         statusBarMenu.addItem(
-            withTitle: "Show Quickmouse",
+            withTitle: "Show QuickMouse",
             action: #selector(handleShowFromMenuRequested),
             keyEquivalent: ""
         )
         
         statusBarMenu.addItem(
-            withTitle: "Quit Quickmouse",
+            withTitle: "Quit QuickMouse",
             action: #selector(handleQuitFromMenuRequested),
             keyEquivalent: ""
         )
@@ -53,10 +53,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc func handleShowFromMenuRequested() {
+        resetEverything()
+        showWindow()
+    }
+
+    func resetEverything() {
         grid.resetZoom()
         grid.centerHighlight()
         renderWindow()
-        showWindow()
     }
     
     func removeOldestEventFromFlagChangePool() -> Void {
@@ -64,8 +68,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
          * need this check because if the async queuing of this fn ends up calling when
          * the array is already empty, it crashes.
          */
-        if (self.flagChangePool.count > 0) {
-            self.flagChangePool.remove(at: 0)
+        if (flagChangePool.count > 0) {
+            flagChangePool.remove(at: 0)
         }
     }
     
@@ -78,14 +82,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @objc func showWindow() {
         NSApp.unhide(self)
         NSApp!.activate(ignoringOtherApps: true)
-        self.window.makeKeyAndOrderFront(self)
+        window.makeKeyAndOrderFront(self)
     }
     
     func isWindowShowing() -> Bool {
-        return NSApp.isHidden
+        NSApp.isHidden
     }
     
-    func selectCol() {
+    func selectHighlightedCell() {
         grid.zoomInOnHighlightedCell()
         grid.centerHighlight()
         renderWindow()
@@ -95,14 +99,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         /*
          * If full-size already, we can't go any further, so just close the window.
          */
-        if (self.grid.hasAnyZoom()) {
-            self.grid.zoomOut()
-            self.renderWindow()
+        if (grid.hasAnyZoom()) {
+            grid.zoomOut()
+            renderWindow()
         } else {
-            self.hideWindow()
+            hideWindow()
         }
     }
-    
+
     // given a list of selected cells, split the screen successively to zoom in each step
     func calculateWindowSize( grid: GridManager) -> NSRect {
         var rect: NSRect = WindowManager.getScreenSize()
@@ -116,8 +120,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func renderWindow() {
-        self.resizeWindow(
-            newFrame: self.calculateWindowSize(grid: self.grid)
+        window.setFrame(
+            WindowManager.convertToBufferFrame(calculateWindowSize(grid: grid)),
+            display: true
         )
     }
 
@@ -159,23 +164,26 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             grid.moveHighlightRight()
             break
         case KeyboardManager.keyCodes["ARROW_UP"]:
-            self.grid.moveHighlightUp()
+            grid.moveHighlightUp()
             break
         case KeyboardManager.keyCodes["ARROW_DOWN"]:
-            self.grid.moveHighlightDown()
+            grid.moveHighlightDown()
             break
         case KeyboardManager.keyCodes["ESCAPE"]:
-            self.undoColSelection()
+            undoColSelection()
             break
         case KeyboardManager.keyCodes["SPACE"]:
-            self.selectCol()
-        break
+            selectHighlightedCell()
+            break
         case KeyboardManager.keyCodes["RETURN"]:
-            self.submit()
-        break
+            submit()
+            break
         default:
-            print(keyCode)
-           self.showModal(title: "Unsupported Keypress", body: "Please use the numpad numbers 1-9, or Arrow Keys, or ESCAPE or ENTER", buttonText: "OK")
+            showModal(
+                title: "Unsupported Keypress",
+                body: "Please use the numpad numbers 1-9, or Arrow Keys, or ESCAPE or ENTER",
+                buttonText: "OK"
+            )
         }
     }
 
@@ -189,9 +197,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func submit() {
         let screenSize = WindowManager.getScreenSize()
-        let frame = self.window.frame
+        let frame = window.frame
         
-        self.hideWindow() // this is slow to close, so we need to add a delay before we trigger click
+        hideWindow() // this is slow to close, so we need to add a delay before we trigger click
         // or else it'll just click our own app window (or the event just doesn't go through)
         
         let clickPos: NSPoint = NSPoint(
@@ -204,20 +212,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
     
-    // TODO: only do it on a double-tap of Caps Lock (or maybe trigger it on CTRL+CAPS?)
     func handleFlagsChanged(_ event: NSEvent) {
         let isControlKeyDownRightNow = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.control)
         
         if (!isControlKeyDownRightNow) {
             return
         }
-        
+
         // add this event to a list of recent flag change events
-        self.flagChangePool.append(event)
-        
+        flagChangePool.append(event)
+
         var eventsWithControlKeyDown: Array<NSEvent> = []
-        
-        self.flagChangePool.forEach({ evt in
+
+        flagChangePool.forEach({ evt in
             let isControlKeyDown = evt.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.control)
             
             if (isControlKeyDown) {
@@ -226,32 +233,32 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         })
         
         
-//        let isCapsLockOn = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock)
-//        let isControlKeyDown = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.control)
-
         if (eventsWithControlKeyDown.count >= 2) {
-            if (self.isWindowShowing()) {
-                grid.resetZoom()
-                self.showWindow()
+            /*
+             * Unhide
+             */
+            if (isWindowShowing()) {
+                resetEverything()
+                showWindow()
             } else {
-                self.hideWindow()
+                hideWindow()
             }
             
             // flush them all so that if the user presses it one more time, there won't be maybe 3 valid events in the time window
             // causing only one more press to toggle again
             // TODO: cancel all queued deletion calls from below!
-            self.flagChangePool.removeAll()
+            flagChangePool.removeAll()
         } else {
             // schedule the removal of this event from the list of flag change events
             // todo: it doesn't really remove THIS event.
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.33333 /* seconds */) {
                 self.removeOldestEventFromFlagChangePool()
             }
         }
     }
     
     func listenForGlobalHotKey() {
-        self.hotKeyMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.flagsChanged], handler: self.handleFlagsChanged)
+        hotKeyMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.flagsChanged], handler: handleFlagsChanged)
     }
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
@@ -281,23 +288,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         window.isOpaque = false
         window.backgroundColor = NSColor(red: 0, green: 0, blue: 0, alpha: 0)
 
-        renderWindow()
+        resetEverything()
         hideWindow()
+        listenForGlobalHotKey()
+    }
 
-        self.listenForGlobalHotKey()
-    }
-    
-    func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
-    }
-    
-    func resizeWindow(newFrame: NSRect) {
-        self.window.setFrame(
-            WindowManager.convertToBufferFrame(newFrame),
-            display: true
-        )
-    }
-    
     // WARNING: this won't work unless the App has been given the correct access to the Accessibility API:
     // https://stackoverflow.com/a/56928709
     // In development, it will require that you toggle the checkbox off and EVERY TIME YOU CHANGE THE CODE AND REBUILD
