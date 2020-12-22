@@ -10,44 +10,13 @@ import AppKit
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
-    var hotKeyMonitor: Any?
-    var window: NSWindow!
+    private var globalHotkeyListener: Any?
+    private var window: NSWindow!
     var statusBarItem: NSStatusItem = MenuBarManager.makeMenuBar()
     var flagChangePool: Array<NSEvent> = []
     let grid = GridManager()
 
-    func quit() {
-        exit(0)
-    }
-
-    func handleKeyUp(_ evt: NSEvent) {
-
-    }
-
-    @objc func handleQuitFromMenuRequested() {
-        quit()
-    }
-
-    @objc func handleShowFromMenuRequested() {
-        resetEverything()
-        showWindow()
-    }
-
-    func resetEverything() {
-        grid.resetZoom()
-        grid.centerHighlight()
-        renderWindow()
-    }
-
-    func removeOldestEventFromFlagChangePool() -> Void {
-        /*
-         * need this check because if the async queuing of this fn ends up calling when
-         * the array is already empty, it crashes.
-         */
-        if (flagChangePool.count > 0) {
-            flagChangePool.remove(at: 0)
-        }
-    }
+    // ---- [ Window methods ] -----------------------------------------------------------------------------------------
 
     func hideWindow() {
         // https://stackoverflow.com/a/48353056/1063035
@@ -65,13 +34,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.isHidden
     }
 
+    func renderWindow() {
+        window.setFrame(
+            WindowManager.convertToBufferFrame(calculateGridSize()),
+            display: true
+        )
+    }
+
+    // ---- [ Cell selection / zooming ] -------------------------------------------------------------------------------
+
     func selectHighlightedCell() {
         grid.zoomInOnHighlightedCell()
         grid.centerHighlight()
         renderWindow()
     }
 
-    func undoColSelection() {
+    func undoCellSelection() {
         /*
          * If full-size already, we can't go any further, so just close the window.
          */
@@ -83,7 +61,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    // given a list of selected cells, split the screen successively to zoom in each step
+    func resetEverything() {
+        grid.resetZoom()
+        grid.centerHighlight()
+        renderWindow()
+    }
+
+    func submit() {
+        hideWindow()
+        MouseManager.click(getCenterPositionOfHighlightedCell())
+    }
+
+    /*
+     * Given a list of selected cells, split the screen successively to zoom in each step
+     */
     func calculateGridSize() -> NSRect {
         var rect: NSRect = WindowManager.getScreenSize()
 
@@ -95,12 +86,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         return rect
     }
 
-    func renderWindow() {
-        window.setFrame(
-            WindowManager.convertToBufferFrame(calculateGridSize()),
-            display: true
+    func getCenterPositionOfHighlightedCell() -> NSPoint {
+        let gridContainer: NSRect = WindowManager.getRectForCell(
+                currentRect: calculateGridSize(),
+                whichCell: grid.highlightedCell
         )
+        return NSPoint(x: gridContainer.midX, y: gridContainer.midY)
     }
+
+    func moveMouseToHighlightedCell() {
+        MouseManager.moveTo(getCenterPositionOfHighlightedCell())
+    }
+
+    // ---- [ Event handlers ] -----------------------------------------------------------------------------------------
 
     func handleKeyDown(_ evt: NSEvent) {
         let keyCode = Int(evt.keyCode)
@@ -146,7 +144,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             grid.moveHighlightDown()
             break
         case KeyboardManager.keyCodes["ESCAPE"]:
-            undoColSelection()
+            undoCellSelection()
             break
         case KeyboardManager.keyCodes["SPACE"]:
             selectHighlightedCell()
@@ -163,19 +161,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         moveMouseToHighlightedCell()
-    }
-
-    func showModal(title: String, body: String, buttonText: String) -> Void {
-        let alert = NSAlert.init()
-        alert.messageText = title
-        alert.informativeText = body
-        alert.addButton(withTitle: buttonText)
-        alert.runModal()
-    }
-
-    func submit() {
-        hideWindow()
-        MouseManager.click(getCenterPositionOfHighlightedCell())
     }
 
     func handleFlagsChanged(_ event: NSEvent) {
@@ -197,7 +182,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 eventsWithControlKeyDown.append(evt)
             }
         })
-
 
         if (eventsWithControlKeyDown.count >= 2) {
             /*
@@ -224,15 +208,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    func listenForGlobalHotKey() {
-        hotKeyMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.flagsChanged], handler: handleFlagsChanged)
+    @objc func handleQuitFromMenuRequested() {
+        quit()
     }
 
-    func applicationWillTerminate(_ notification: Notification) {
-        if (hotKeyMonitor != nil) {
-            NSEvent.removeMonitor(hotKeyMonitor!)
-        }
+    @objc func handleShowFromMenuRequested() {
+        resetEverything()
+        showWindow()
     }
+
+    // ---- [ Application lifecycle ] ----------------------------------------------------------------------------------
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Create the SwiftUI view that provides the window contents.
@@ -252,7 +237,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             backing: .buffered,
             shouldDefer: false,
             keyDownHandler: handleKeyDown,
-            keyUpHandler: handleKeyUp,
             flagsChangeHandler: handleFlagsChanged
         )
 
@@ -282,18 +266,40 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         resetEverything()
         hideWindow()
-        listenForGlobalHotKey()
+
+        globalHotkeyListener = NSEvent.addGlobalMonitorForEvents(matching: [.flagsChanged], handler: handleFlagsChanged)
     }
 
-    func getCenterPositionOfHighlightedCell() -> NSPoint {
-        let gridContainer: NSRect = WindowManager.getRectForCell(
-            currentRect: calculateGridSize(),
-            whichCell: grid.highlightedCell
-        )
-        return NSPoint(x: gridContainer.midX, y: gridContainer.midY)
+    func applicationWillTerminate(_ notification: Notification) {
+        if (globalHotkeyListener != nil) {
+            NSEvent.removeMonitor(globalHotkeyListener!)
+        }
     }
 
-    func moveMouseToHighlightedCell() {
-        MouseManager.moveTo(getCenterPositionOfHighlightedCell())
+    // ---- [ Application side-effects ] -------------------------------------------------------------------------------
+
+    func quit() {
+        exit(0)
     }
+
+    // ---- [ Misc ] ---------------------------------------------------------------------------------------------------
+
+    func removeOldestEventFromFlagChangePool() -> Void {
+        /*
+         * need this check because if the async queuing of this fn ends up calling when
+         * the array is already empty, it crashes.
+         */
+        if (flagChangePool.count > 0) {
+            flagChangePool.remove(at: 0)
+        }
+    }
+
+    func showModal(title: String, body: String, buttonText: String) -> Void {
+        let alert = NSAlert.init()
+        alert.messageText = title
+        alert.informativeText = body
+        alert.addButton(withTitle: buttonText)
+        alert.runModal()
+    }
+
 }
