@@ -11,6 +11,12 @@ import AppKit
 class AppDelegate: NSObject, NSApplicationDelegate {
 
     private var globalHotkeyListener: Any?
+
+    /*
+     * If the application is showing and the user clicks anywhere, we want to hide the application since they've done
+     * something with the mouse on their own.
+     */
+    private var globalClickListener: Any?
     private var window: NSWindow!
     var statusBarItem: NSStatusItem = MenuBarManager.makeMenuBar()
     var flagChangePool: Array<NSEvent> = []
@@ -173,6 +179,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         moveMouseToHighlightedCell()
     }
 
+    func handleGlobalClick(_ event: NSEvent) {
+        hideWindow()
+    }
+
     func handleFlagsChanged(_ event: NSEvent) {
         let isControlKeyDownRightNow = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.control)
 
@@ -200,7 +210,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             if (isWindowShowing()) {
                 resetEverything()
                 showWindow()
-                moveMouseToHighlightedCell()
             } else {
                 hideWindow()
             }
@@ -274,10 +283,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
          */
         window.ignoresMouseEvents = true
 
-        resetEverything()
+        grid.resetZoom()
         hideWindow()
 
         globalHotkeyListener = NSEvent.addGlobalMonitorForEvents(matching: [.flagsChanged], handler: handleFlagsChanged)
+        globalClickListener = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown], handler: handleGlobalClick)
     }
 
     func applicationWillTerminate(_ notification: Notification) {
