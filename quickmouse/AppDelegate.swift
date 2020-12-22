@@ -4,6 +4,9 @@ import ApplicationServices
 import Combine
 import AppKit
 
+// note: LSUIElement (Application is agent) has been set to true in the Info.plist file
+// see https://apple.stackexchange.com/a/92017
+
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
