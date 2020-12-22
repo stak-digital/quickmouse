@@ -294,6 +294,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         window.isOpaque = false
         window.backgroundColor = NSColor(red: 0, green: 0, blue: 0, alpha: 0)
 
+        /*
+         * Ensure our application is drawn with a high-enough z-index to cover not just the applications,
+         * but also the menubar.
+
+         * see: https://stackoverflow.com/a/18509390/1063035
+         */
+        window.level = NSWindow.Level.popUpMenu
+
         resetEverything()
         hideWindow()
         listenForGlobalHotKey()
