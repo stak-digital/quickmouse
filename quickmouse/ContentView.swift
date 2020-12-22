@@ -54,14 +54,14 @@ struct Row: View {
 }
 
 struct ContentView: View {
-    
     @EnvironmentObject var grid: GridManager
         
     var body: some View {
         VStack(spacing: 0) {
-            Row(index: 2, highlightedCell: grid.highlightedCell, cols: grid.cols)
-            Row(index: 1, highlightedCell: grid.highlightedCell, cols: grid.cols)
-            Row(index: 0, highlightedCell: grid.highlightedCell, cols: grid.cols)
-            }.frame(maxWidth: .infinity, maxHeight: .infinity).background(Color.clear)
+            // this is the insane way to do `(1...grid.rows).reversed()`
+            ForEach(0..<(grid.rows)) { rowNumber in
+                Row(index: (grid.rows - rowNumber) - 1, highlightedCell: grid.highlightedCell, cols: grid.cols)
+            }
+        }.frame(maxWidth: .infinity, maxHeight: .infinity).background(Color.clear)
     }
 }

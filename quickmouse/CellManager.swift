@@ -12,63 +12,41 @@ class CellManager {
     static let rows = 3
     static let cols = 3
     
-    static func decrementCol(_ current: Int) -> Int {
-        switch current {
-        case 2:
-            return 1
-        case 3:
-            return 2
-        case 5:
-            return 4
-        case 6:
-            return 5
-        case 8:
-            return 7
-        case 9:
-            return 8
-        default:
+    static func decrementCol(_ current: Int, cols: Int) -> Int {
+        if (current % cols == 1) {
             return current
         }
+
+        return current - 1
     }
     
-    static func incrementCol(_ current: Int) -> Int {
-        switch current {
-        case 1:
-            return 2
-        case 2:
-            return 3
-        case 4:
-            return 5
-        case 5:
-            return 6
-        case 7:
-            return 8
-        case 8:
-            return 9
-        default:
+    static func incrementCol(_ current: Int, cols: Int) -> Int {
+        if (current % cols == 0) {
             return current
         }
+
+        return current + 1
     }
     
-    static func decrementRow(_ currentCol: Int) -> Int {
-        switch currentCol {
-        case 4...9:
-            return currentCol - CellManager.cols
-        case 1...3:
+    static func decrementRow(_ currentCol: Int, cols: Int, rows: Int) -> Int {
+        let newCol = currentCol - cols
+        let minCol = 0
+
+        if (newCol < minCol) {
             return currentCol
-        default:
-            return currentCol
+        } else {
+            return newCol
         }
     }
     
-    static func incrementRow(_ currentCol: Int) -> Int {
-        switch currentCol {
-        case 7...9:
+    static func incrementRow(_ currentCol: Int, cols: Int, rows: Int) -> Int {
+        let newCol = currentCol + cols
+        let maxCol = cols * rows
+
+        if (newCol > maxCol) {
             return currentCol
-        case 1...6:
-            return currentCol + CellManager.cols
-        default:
-            return currentCol
+        } else {
+            return newCol
         }
     }
 }

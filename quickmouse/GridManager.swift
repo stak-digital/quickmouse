@@ -19,7 +19,9 @@ class GridManager: ObservableObject {
     }
 
     func centerHighlight() {
-        highlightedCell = 5
+        let cells = Float(rows) * Float(cols)
+        let middle = cells / 2
+        highlightedCell = Int(ceil(Double(middle)))
     }
 
     func moveHighlightTo(_ cellNumber: Int) -> Void {
@@ -43,18 +45,18 @@ class GridManager: ObservableObject {
     }
 
     func moveHighlightUp() -> Void {
-        highlightedCell = CellManager.incrementRow(highlightedCell)
+        highlightedCell = CellManager.incrementRow(highlightedCell, cols: cols, rows: rows)
     }
 
     func moveHighlightDown() -> Void {
-        highlightedCell = CellManager.decrementRow(highlightedCell)
+        highlightedCell = CellManager.decrementRow(highlightedCell, cols: cols, rows: rows)
     }
 
     func moveHighlightLeft() -> Void {
-        highlightedCell = CellManager.decrementCol(highlightedCell)
+        highlightedCell = CellManager.decrementCol(highlightedCell, cols: cols)
     }
 
     func moveHighlightRight() -> Void {
-        highlightedCell = CellManager.incrementCol(highlightedCell)
+        highlightedCell = CellManager.incrementCol(highlightedCell, cols: cols)
     }
 }
